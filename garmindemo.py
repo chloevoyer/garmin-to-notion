@@ -33,12 +33,6 @@ def write_row(client, database_id, activity_type, activity_name, distance, durat
     )
 
 def main():
-    # Load last sync data
-    last_sync_file = 'last_sync.json'
-    last_sync_data = load_last_sync(last_sync_file)
-    last_sync_timestamp = last_sync_data["last_sync_timestamp"]
-    last_sync_id = last_sync_data["latest_activity_id"]
-
     # Initialize Garmin and Notion clients using environment variables
     garmin_email = os.getenv("GARMIN_EMAIL")
     garmin_password = os.getenv("GARMIN_PASSWORD")
@@ -56,7 +50,6 @@ def main():
 
     # Fetch activities
     activities = garmin.get_activities(0, 100)
-    latest_id = last_sync_id
 
     # Process activities
     for activity in activities:
