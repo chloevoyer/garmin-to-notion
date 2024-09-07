@@ -1,21 +1,7 @@
-import json
 import os
 from datetime import datetime
 from garminconnect import Garmin
 from notion_client import Client
-
-def load_last_sync(filename):
-    """Load last sync information from a JSON file."""
-    if os.path.exists(filename):
-        with open(filename, 'r') as file:
-            return json.load(file)
-    else:
-        return {"last_sync_timestamp": "1970-01-01T00:00:00Z", "latest_activity_id": ""}
-
-def save_last_sync(filename, last_sync_data):
-    """Save last sync information to a JSON file."""
-    with open(filename, 'w') as file:
-        json.dump(last_sync_data, file, indent=4)
 
 def format_activity_type(activity_type):
     """Formats the activity type to be capitalized and removes underscores."""
@@ -94,13 +80,6 @@ def main():
             latest_id = max(latest_id, activity_id)
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
-
-    # Update last sync data
-    if latest_id != last_sync_id:
-        last_sync_data["last_sync_timestamp"] = datetime.now().isoformat()
-        last_sync_data["latest_activity_id"] = latest_id
-        save_last_sync(last_sync_file, last_sync_data)
-        print("Last sync data updated.")
 
 if __name__ == '__main__':
     main()
