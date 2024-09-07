@@ -24,18 +24,11 @@ def update_last_sync(file_path, new_timestamp, new_activity_id):
         json.dump(data, file)
 
 def format_activity_type(activity_type):
-    """
-    Formats the activity type to be capitalized and removes underscores.
-    Example: 'running' -> 'Running', 'indoor_cycling' -> 'Indoor Cycling'
-    """
     return activity_type.replace('_', ' ').title()
 
 def format_pace(average_speed):
-    """
-    Converts average speed (m/s) to pace (min/km) and formats it as a string.
-    """
     if average_speed > 0:
-        pace_min_km = 1000 / (average_speed * 60)  # Convert to min/km
+        pace_min_km = 1000 / (average_speed * 60)
         minutes = int(pace_min_km)
         seconds = int((pace_min_km - minutes) * 60)
         return f"{minutes}:{seconds:02d} min/km"
@@ -43,9 +36,6 @@ def format_pace(average_speed):
         return ""
 
 def write_row(client, database_id, activity_type, activity_name, distance, duration, calories, activity_date, avg_pace):
-    """
-    Writes a row to the Notion database with the specified activity details.
-    """
     client.pages.create(
         parent={"database_id": database_id},
         properties={
@@ -60,19 +50,15 @@ def write_row(client, database_id, activity_type, activity_name, distance, durat
     )
 
 def main():
-    # Notion credentials from environment variables
+    # Notion and Garmin credentials
     notion_token = os.getenv("NOTION_TOKEN")
-    database_id = os.getenv("NOTION_DB_ID")
-
-    # Garmin credentials from environment variables
     garmin_email = os.getenv("GARMIN_EMAIL")
     garmin_password = os.getenv("GARMIN_PASSWORD")
+    database_id = os.getenv("NOTION_DB_ID")
 
-    # Initialize Garmin client and login
+    # Initialize Garmin and Notion clients
     garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
-
-    # Initialize Notion client with the correct token
     client = Client(auth=notion_token)
 
     # Read last sync info
