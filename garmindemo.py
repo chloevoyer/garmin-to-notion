@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 from garminconnect import Garmin
 from notion_client import Client
-from getpass import getpass
 
 def load_last_sync(filename):
     """Load last sync information from a JSON file."""
@@ -54,10 +53,20 @@ def main():
     last_sync_timestamp = last_sync_data["last_sync_timestamp"]
     last_sync_id = last_sync_data["latest_activity_id"]
 
-    # Initialize Garmin and Notion clients
-    garmin = Garmin(getpass("Enter email address: "), getpass("Enter password: "))
+    # Initialize Garmin and Notion clients using environment variables
+    garmin_email = os.getenv("GARMIN_EMAIL")
+    garmin_password = os.getenv("GARMIN_PASSWORD")
+    notion_token = os.getenv("NOTION_TOKEN")
+    database_id = os.getenv("NOTION_DB_ID")
+    page_id = os.getenv("NOTION_PG_ID")
+
+    if not (garmin_email and garmin_password and notion_token and database_id):
+        print("Error: Missing one or more environment variables.")
+        return
+
+    garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
-    client = Client(auth=os.getenv("NOTION_TOKEN"))
+    client = Client(auth=notion_token)
 
     # Fetch activities
     activities = garmin.get_activities(0, 100)
@@ -73,14 +82,14 @@ def main():
         activity_name = activity.get('activityName', 'Unnamed Activity')
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
-        calories = activity.get('calories', 0)
+        calories = activity.get('activeKilocalories', 0)
         activity_date = activity.get('startTimeLocal', datetime.now().isoformat())
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
 
         # Write to Notion
         try:
-            write_row(client, os.getenv("NOTION_DB_ID"), activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
+            write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
             print(f"Successfully written: {activity_type} - {activity_name}")
             latest_id = max(latest_id, activity_id)
         except Exception as e:
