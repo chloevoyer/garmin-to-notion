@@ -83,16 +83,17 @@ def main():
     # Fetch activities
     activities = garmin.get_activities(0, 100)  # Adjust to filter by last_sync_timestamp or latest_activity_id
 
-    # Iterate through each new activity and extract required details
-    for activity in new_activities:
+    for activity in activities:
+        # Process each activity
+        activity_id = activity.get('activityId', '')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = activity.get('activityName', 'Unnamed Activity')
-        distance_km = round(activity.get('distance', 0) / 1000, 2)  # Convert distance to km
-        duration_minutes = round(activity.get('duration', 0) / 60, 2)  # Convert duration to minutes
-        calories = activity.get('activeKilocalories', 0)  # Extract calories
-        activity_date = activity.get('startTimeLocal')  # Extract activity date
-        average_speed = activity.get('averageSpeed', 0)  # Get the average speed in m/s
-        avg_pace = format_pace(average_speed)  # Convert speed to pace in min/km format
+        distance_km = round(activity.get('distance', 0) / 1000, 2)
+        duration_minutes = round(activity.get('duration', 0) / 60, 2)
+        calories = activity.get('activeKilocalories', 0)
+        activity_date = activity.get('startTimeLocal', date.today().isoformat())
+        average_speed = activity.get('averageSpeed', 0)
+        avg_pace = format_pace(average_speed)
 
         # Write to Notion
         write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
