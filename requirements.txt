@@ -1,0 +1,2 @@
+garminconnect==0.1.35
+notion-client==2.0.0
