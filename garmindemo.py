@@ -1,29 +1,27 @@
+import json
 from garminconnect import Garmin
 from getpass import getpass
-from datetime import datetime
+from datetime import date
 from notion_client import Client
 import os
-import json
 
-LAST_SYNC_FILE = "last_sync.json"  # File to store the last sync date
+# File path for last_sync.json
+SYNC_FILE_PATH = 'last_sync.json'
 
-def get_last_sync_date():
-    """
-    Retrieve the last sync date from a JSON file.
-    If the file does not exist, return a date far in the past.
-    """
-    if os.path.exists(LAST_SYNC_FILE):
-        with open(LAST_SYNC_FILE, "r") as file:
-            data = json.load(file)
-            return datetime.fromisoformat(data.get("last_sync", "2000-01-01T00:00:00"))
-    return datetime(2000, 1, 1)
+def read_last_sync(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {"last_sync_timestamp": "1970-01-01T00:00:00Z", "latest_activity_id": ""}
 
-def update_last_sync_date(sync_date):
-    """
-    Update the last sync date in a JSON file.
-    """
-    with open(LAST_SYNC_FILE, "w") as file:
-        json.dump({"last_sync": sync_date.isoformat()}, file)
+def update_last_sync(file_path, new_timestamp, new_activity_id):
+    data = {
+        "last_sync_timestamp": new_timestamp,
+        "latest_activity_id": new_activity_id
+    }
+    with open(file_path, 'w') as file:
+        json.dump(data, file)
 
 def format_activity_type(activity_type):
     """
@@ -77,14 +75,13 @@ def main():
     # Initialize Notion client with the correct token
     client = Client(auth=notion_token)
 
-    # Get the last sync date and fetch activities since that date
-    last_sync_date = get_last_sync_date()
-    today = datetime.now()
+    # Read last sync info
+    last_sync = read_last_sync(SYNC_FILE_PATH)
+    last_sync_timestamp = last_sync["last_sync_timestamp"]
+    latest_activity_id = last_sync["latest_activity_id"]
 
-    # Fetch the first 100 activities
-    activities = garmin.get_activities(0, 100)
-    # Filter new activities since the last sync date
-    new_activities = [act for act in activities if datetime.fromisoformat(act.get('startTimeLocal')) > last_sync_date]
+    # Fetch activities
+    activities = garmin.get_activities(0, 100)  # Adjust to filter by last_sync_timestamp or latest_activity_id
 
     # Iterate through each new activity and extract required details
     for activity in new_activities:
@@ -97,20 +94,15 @@ def main():
         average_speed = activity.get('averageSpeed', 0)  # Get the average speed in m/s
         avg_pace = format_pace(average_speed)  # Convert speed to pace in min/km format
 
-        # Print the extracted details
-        print(f"Processing {activity_type}: {activity_name}")
-        print(f"Distance: {distance_km} km, Duration: {duration_minutes} min, Calories: {calories}, Avg Pace: {avg_pace}, Date: {activity_date}")
+        # Write to Notion
+        write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
 
-        # Write activity details to the Notion database
-        try:
-            write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
-            print("Successfully written to Notion database.")
-        except Exception as e:
-            print(f"Failed to write to Notion: {e}")
+        # Update latest_activity_id
+        if activity_id > latest_activity_id:
+            latest_activity_id = activity_id
 
-    # Update the last sync date
-    update_last_sync_date(today)
-    print("Finished processing all activities.")
+    # Update last sync file
+    update_last_sync(SYNC_FILE_PATH, date.today().isoformat(), latest_activity_id)
 
 if __name__ == '__main__':
     main()
