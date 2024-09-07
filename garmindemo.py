@@ -1,34 +1,31 @@
 import json
-from garminconnect import Garmin
-from getpass import getpass
-from datetime import date
-from notion_client import Client
 import os
+from datetime import datetime
+from garminconnect import Garmin
+from notion_client import Client
+from getpass import getpass
 
-# File path for last_sync.json
-SYNC_FILE_PATH = 'last_sync.json'
-
-def read_last_sync(file_path):
-    try:
-        with open(file_path, 'r') as file:
+def load_last_sync(filename):
+    """Load last sync information from a JSON file."""
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
             return json.load(file)
-    except FileNotFoundError:
+    else:
         return {"last_sync_timestamp": "1970-01-01T00:00:00Z", "latest_activity_id": ""}
 
-def update_last_sync(file_path, new_timestamp, new_activity_id):
-    data = {
-        "last_sync_timestamp": new_timestamp,
-        "latest_activity_id": new_activity_id
-    }
-    with open(file_path, 'w') as file:
-        json.dump(data, file)
+def save_last_sync(filename, last_sync_data):
+    """Save last sync information to a JSON file."""
+    with open(filename, 'w') as file:
+        json.dump(last_sync_data, file, indent=4)
 
 def format_activity_type(activity_type):
+    """Formats the activity type to be capitalized and removes underscores."""
     return activity_type.replace('_', ' ').title()
 
 def format_pace(average_speed):
+    """Converts average speed (m/s) to pace (min/km) and formats it as a string."""
     if average_speed > 0:
-        pace_min_km = 1000 / (average_speed * 60)
+        pace_min_km = 1000 / (average_speed * 60)  # Convert to min/km
         minutes = int(pace_min_km)
         seconds = int((pace_min_km - minutes) * 60)
         return f"{minutes}:{seconds:02d} min/km"
@@ -36,6 +33,7 @@ def format_pace(average_speed):
         return ""
 
 def write_row(client, database_id, activity_type, activity_name, distance, duration, calories, activity_date, avg_pace):
+    """Writes a row to the Notion database with the specified activity details."""
     client.pages.create(
         parent={"database_id": database_id},
         properties={
@@ -50,46 +48,50 @@ def write_row(client, database_id, activity_type, activity_name, distance, durat
     )
 
 def main():
-    # Notion and Garmin credentials
-    notion_token = os.getenv("NOTION_TOKEN")
-    garmin_email = os.getenv("GARMIN_EMAIL")
-    garmin_password = os.getenv("GARMIN_PASSWORD")
-    database_id = os.getenv("NOTION_DB_ID")
+    # Load last sync data
+    last_sync_file = 'last_sync.json'
+    last_sync_data = load_last_sync(last_sync_file)
+    last_sync_timestamp = last_sync_data["last_sync_timestamp"]
+    last_sync_id = last_sync_data["latest_activity_id"]
 
     # Initialize Garmin and Notion clients
-    garmin = Garmin(garmin_email, garmin_password)
+    garmin = Garmin(getpass("Enter email address: "), getpass("Enter password: "))
     garmin.login()
-    client = Client(auth=notion_token)
-
-    # Read last sync info
-    last_sync = read_last_sync(SYNC_FILE_PATH)
-    last_sync_timestamp = last_sync["last_sync_timestamp"]
-    latest_activity_id = last_sync["latest_activity_id"]
+    client = Client(auth=os.getenv("NOTION_TOKEN"))
 
     # Fetch activities
-    activities = garmin.get_activities(0, 100)  # Adjust to filter by last_sync_timestamp or latest_activity_id
+    activities = garmin.get_activities(0, 100)
+    latest_id = last_sync_id
 
+    # Process activities
     for activity in activities:
-        # Process each activity
         activity_id = activity.get('activityId', '')
+        if activity_id <= last_sync_id:
+            continue
+        
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = activity.get('activityName', 'Unnamed Activity')
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
-        calories = activity.get('activeKilocalories', 0)
-        activity_date = activity.get('startTimeLocal', date.today().isoformat())
+        calories = activity.get('calories', 0)
+        activity_date = activity.get('startTimeLocal', datetime.now().isoformat())
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
 
         # Write to Notion
-        write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
+        try:
+            write_row(client, os.getenv("NOTION_DB_ID"), activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
+            print(f"Successfully written: {activity_type} - {activity_name}")
+            latest_id = max(latest_id, activity_id)
+        except Exception as e:
+            print(f"Failed to write to Notion: {e}")
 
-        # Update latest_activity_id
-        if activity_id > latest_activity_id:
-            latest_activity_id = activity_id
-
-    # Update last sync file
-    update_last_sync(SYNC_FILE_PATH, date.today().isoformat(), latest_activity_id)
+    # Update last sync data
+    if latest_id != last_sync_id:
+        last_sync_data["last_sync_timestamp"] = datetime.now().isoformat()
+        last_sync_data["latest_activity_id"] = latest_id
+        save_last_sync(last_sync_file, last_sync_data)
+        print("Last sync data updated.")
 
 if __name__ == '__main__':
     main()
