@@ -1,0 +1,30 @@
+name: Sync Garmin Activities to Notion
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Runs daily at 6 AM UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Sync Garmin Activities
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+        run: python garmindemo.py
