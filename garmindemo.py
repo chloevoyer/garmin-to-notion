@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
 import pytz
@@ -71,39 +71,47 @@ def main():
         print(f"Error connecting to Notion: {e}")
         return
 
-    # Fetch activities (increase the range to ensure we fetch enough data)
+    # Fetch activities without filtering dates to see all available data
     try:
-        activities = garmin.get_activities(0, 50)  # Fetch more activities
+        activities = garmin.get_activities(0, 50)  # Increase the range to capture more data
         print(f"Fetched {len(activities)} activities from Garmin.")
-        for activity in activities:  # Print all activities to inspect their details
-            print(activity)
+        if len(activities) == 0:
+            print("No activities were fetched. Ensure there are activities to retrieve and that permissions are correct.")
+        else:
+            for activity in activities:
+                # Print the raw activity data for debugging purposes
+                print("Raw activity data:", activity)
+
+                # Extract and print the start time to ensure correct date parsing
+                start_time = activity.get('startTimeLocal', 'N/A')
+                print(f"Activity Start Time: {start_time}")
+
+                # Extract date to check alignment with today's date
+                activity_date = datetime.fromisoformat(start_time).date() if start_time != 'N/A' else None
+                if activity_date:
+                    print(f"Parsed Activity Date: {activity_date}")
+                else:
+                    print("Error parsing activity date.")
+
+                # Check if activity date matches today's date
+                if activity_date != montreal_time.date():
+                    print(f"Skipping activity on {activity_date} as it is not today.")
+                    continue
+
+                # Extract and process activity details
+                activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
+                activity_name = activity.get('activityName', 'Unnamed Activity')
+                distance_km = round(activity.get('distance', 0) / 1000, 2)
+                duration_minutes = round(activity.get('duration', 0) / 60, 2)
+                calories = activity.get('activeKilocalories', 0)
+                average_speed = activity.get('averageSpeed', 0)
+                avg_pace = format_pace(average_speed)
+
+                # Attempt to write to Notion
+                write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
+
     except Exception as e:
         print(f"Error fetching activities from Garmin: {e}")
-        return
-
-    # Get today's date
-    today = datetime.now().date()
-    print(f"Today's date: {today}")
-
-    # Process only today's activities
-    for activity in activities:
-        activity_date = datetime.fromisoformat(activity.get('startTimeLocal')).date()
-        print(f"Activity date: {activity_date}, Activity name: {activity.get('activityName')}")
-
-        if activity_date != today:
-            print(f"Skipping activity on {activity_date} as it is not today.")
-            continue
-
-        activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
-        activity_name = activity.get('activityName', 'Unnamed Activity')
-        distance_km = round(activity.get('distance', 0) / 1000, 2)
-        duration_minutes = round(activity.get('duration', 0) / 60, 2)
-        calories = activity.get('activeKilocalories', 0)
-        average_speed = activity.get('averageSpeed', 0)
-        avg_pace = format_pace(average_speed)
-
-        # Attempt to write to Notion
-        write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
 
 if __name__ == '__main__':
     main()
