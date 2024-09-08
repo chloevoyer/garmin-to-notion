@@ -7,7 +7,6 @@ import pytz
 # Convert the current UTC time to Montreal timezone
 utc_time = datetime.now(pytz.utc)
 montreal_time = utc_time.astimezone(pytz.timezone('America/Montreal'))
-
 print(f"Current time in Montreal: {montreal_time}")
 
 def format_activity_type(activity_type):
@@ -26,18 +25,23 @@ def format_pace(average_speed):
 
 def write_row(client, database_id, activity_type, activity_name, distance, duration, calories, activity_date, avg_pace):
     """Writes a row to the Notion database with the specified activity details."""
-    client.pages.create(
-        parent={"database_id": database_id},
-        properties={
-            "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-            "Activity Type": {"select": {"name": activity_type}},
-            "Distance (km)": {"number": distance},
-            "Duration (min)": {"number": duration},
-            "Calories": {"number": calories},
-            "Date": {"date": {"start": activity_date}},
-            "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]}
-        }
-    )
+    print(f"Attempting to write to Notion: {activity_name}, Date: {activity_date}")
+    try:
+        client.pages.create(
+            parent={"database_id": database_id},
+            properties={
+                "Activity Name": {"title": [{"text": {"content": activity_name}}]},
+                "Activity Type": {"select": {"name": activity_type}},
+                "Distance (km)": {"number": distance},
+                "Duration (min)": {"number": duration},
+                "Calories": {"number": calories},
+                "Date": {"date": {"start": activity_date}},
+                "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]}
+            }
+        )
+        print(f"Successfully written: {activity_name}")
+    except Exception as e:
+        print(f"Failed to write to Notion: {e}")
 
 def main():
     # Initialize Garmin and Notion clients using environment variables
@@ -48,25 +52,32 @@ def main():
 
     # Check for missing environment variables
     if not garmin_email or not garmin_password or not notion_token or not database_id:
-        print("Error: Missing one or more environment variables. Ensure that GARMIN_EMAIL, GARMIN_PASSWORD, NOTION_TOKEN, and NOTION_DB_ID are set.")
+        print("Error: Missing one or more environment variables.")
         return
 
     # Initialize Garmin and Notion clients
     try:
         garmin = Garmin(garmin_email, garmin_password)
         garmin.login()
+        print("Logged in to Garmin successfully.")
     except Exception as e:
         print(f"Error logging into Garmin: {e}")
         return
 
     try:
         client = Client(auth=notion_token)
+        print("Connected to Notion successfully.")
     except Exception as e:
         print(f"Error connecting to Notion: {e}")
         return
 
     # Fetch activities
-    activities = garmin.get_activities(0, 10)
+    try:
+        activities = garmin.get_activities(0, 10)
+        print(f"Fetched {len(activities)} activities from Garmin.")
+    except Exception as e:
+        print(f"Error fetching activities from Garmin: {e}")
+        return
 
     # Get today's date
     today = datetime.now().date()
@@ -75,7 +86,7 @@ def main():
     # Process only today's activities
     for activity in activities:
         activity_date = datetime.fromisoformat(activity.get('startTimeLocal')).date()
-        print(f"Activity date: {activity_date}, Activity name: {activity.get('activityName')}")  # Debugging output
+        print(f"Activity date: {activity_date}, Activity name: {activity.get('activityName')}")
 
         if activity_date != today:
             print(f"Skipping activity on {activity_date} as it is not today.")
@@ -89,11 +100,8 @@ def main():
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
 
-        try:
-            write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
-            print(f"Successfully written: {activity_type} - {activity_name}")
-        except Exception as e:
-            print(f"Failed to write to Notion: {e}")
+        # Attempt to write to Notion
+        write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
 
 if __name__ == '__main__':
     main()
