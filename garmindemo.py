@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from garminconnect import Garmin
 from notion_client import Client
 import pytz
@@ -46,34 +46,41 @@ def main():
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
 
-    if not (garmin_email and garmin_password and notion_token and database_id):
-        print("Error: Missing one or more environment variables.")
+    # Check for missing environment variables
+    if not garmin_email or not garmin_password or not notion_token or not database_id:
+        print("Error: Missing one or more environment variables. Ensure that GARMIN_EMAIL, GARMIN_PASSWORD, NOTION_TOKEN, and NOTION_DB_ID are set.")
         return
 
-    garmin = Garmin(garmin_email, garmin_password)
-    garmin.login()
-    client = Client(auth=notion_token)
+    # Initialize Garmin and Notion clients
+    try:
+        garmin = Garmin(garmin_email, garmin_password)
+        garmin.login()
+    except Exception as e:
+        print(f"Error logging into Garmin: {e}")
+        return
+
+    try:
+        client = Client(auth=notion_token)
+    except Exception as e:
+        print(f"Error connecting to Notion: {e}")
+        return
 
     # Fetch activities
     activities = garmin.get_activities(0, 10)
 
-    # Get today's date and print it for debugging
+    # Get today's date
     today = datetime.now().date()
     print(f"Today's date: {today}")
 
     # Process only today's activities
     for activity in activities:
-        # Convert the activity date string to a datetime object
         activity_date = datetime.fromisoformat(activity.get('startTimeLocal')).date()
         print(f"Activity date: {activity_date}, Activity name: {activity.get('activityName')}")  # Debugging output
 
-        # Check if the activity date is today
         if activity_date != today:
             print(f"Skipping activity on {activity_date} as it is not today.")
-            continue  # Skip activities that are not from today
+            continue
 
-        # Extract other activity details
-        activity_id = activity.get('activityId', '')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = activity.get('activityName', 'Unnamed Activity')
         distance_km = round(activity.get('distance', 0) / 1000, 2)
@@ -82,7 +89,6 @@ def main():
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
 
-        # Write to Notion
         try:
             write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
             print(f"Successfully written: {activity_type} - {activity_name}")
