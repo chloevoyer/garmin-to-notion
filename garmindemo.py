@@ -73,7 +73,7 @@ def main():
 
     # Fetch activities without filtering dates to see all available data
     try:
-        activities = garmin.get_activities(0, 50)  # Increase the range to capture more data
+        activities = garmin.get_activities(0, 1000)  # Increase the range to capture more data
         print(f"Fetched {len(activities)} activities from Garmin.")
         if len(activities) == 0:
             print("No activities were fetched. Ensure there are activities to retrieve and that permissions are correct.")
