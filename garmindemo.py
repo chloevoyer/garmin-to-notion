@@ -2,6 +2,13 @@ import os
 from datetime import datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
+import pytz
+
+# Convert the current UTC time to Montreal timezone
+utc_time = datetime.now(pytz.utc)
+montreal_time = utc_time.astimezone(pytz.timezone('America/Montreal'))
+
+print(f"Current time in Montreal: {montreal_time}")
 
 def format_activity_type(activity_type):
     """Formats the activity type to be capitalized and removes underscores."""
