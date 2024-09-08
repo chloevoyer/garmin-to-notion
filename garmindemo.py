@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
 # from getpass import getpass
-# import os
 
 def format_activity_type(activity_type):
     """
@@ -80,9 +79,8 @@ def main():
 
         # Write to Notion
         try:
-            write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, activity_date, avg_pace)
+            write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
             print(f"Successfully written: {activity_type} - {activity_name}")
-            latest_id = max(latest_id, activity_id)
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
 
