@@ -2,13 +2,9 @@ import os
 from datetime import datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
-# from getpass import getpass
 
 def format_activity_type(activity_type):
-    """
-    Formats the activity type to be capitalized and removes underscores.
-    Example: 'running' -> 'Running', 'indoor_cycling' -> 'Indoor Cycling'
-    """
+    """Formats the activity type to be capitalized and removes underscores."""
     return activity_type.replace('_', ' ').title()
 
 def format_pace(average_speed):
@@ -42,7 +38,6 @@ def main():
     garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
-    page_id = os.getenv("NOTION_PG_ID")
 
     if not (garmin_email and garmin_password and notion_token and database_id):
         print("Error: Missing one or more environment variables.")
@@ -54,8 +49,8 @@ def main():
 
     # Fetch activities
     activities = garmin.get_activities(0, 10)
-    
-    # Get today's date
+
+    # Get today's date and print it for debugging
     today = datetime.now().date()
     print(f"Today's date: {today}")
 
@@ -76,7 +71,7 @@ def main():
         activity_name = activity.get('activityName', 'Unnamed Activity')
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
-        calories = activity.get('calories', 0)
+        calories = activity.get('activeKilocalories', 0)
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
 
