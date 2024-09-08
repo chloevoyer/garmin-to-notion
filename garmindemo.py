@@ -57,14 +57,17 @@ def main():
     
     # Get today's date
     today = datetime.now().date()
+    print(f"Today's date: {today}")
 
     # Process only today's activities
     for activity in activities:
         # Convert the activity date string to a datetime object
         activity_date = datetime.fromisoformat(activity.get('startTimeLocal')).date()
+        print(f"Activity date: {activity_date}, Activity name: {activity.get('activityName')}")  # Debugging output
 
         # Check if the activity date is today
         if activity_date != today:
+            print(f"Skipping activity on {activity_date} as it is not today.")
             continue  # Skip activities that are not from today
 
         # Extract other activity details
