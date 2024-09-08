@@ -2,9 +2,14 @@ import os
 from datetime import datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
+# from getpass import getpass
+# import os
 
 def format_activity_type(activity_type):
-    """Formats the activity type to be capitalized and removes underscores."""
+    """
+    Formats the activity type to be capitalized and removes underscores.
+    Example: 'running' -> 'Running', 'indoor_cycling' -> 'Indoor Cycling'
+    """
     return activity_type.replace('_', ' ').title()
 
 def format_pace(average_speed):
@@ -63,12 +68,13 @@ def main():
         if activity_date != today:
             continue  # Skip activities that are not from today
 
+        # Extract other activity details
+        activity_id = activity.get('activityId', '')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = activity.get('activityName', 'Unnamed Activity')
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
         calories = activity.get('calories', 0)
-        activity_date = activity.get('startTimeLocal', datetime.now().isoformat())
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
 
