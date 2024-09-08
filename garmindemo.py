@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
 import pytz
