@@ -49,19 +49,25 @@ def main():
     client = Client(auth=notion_token)
 
     # Fetch activities
-    activities = garmin.get_activities(0, 100)
+    activities = garmin.get_activities(0, 10)
+    
+    # Get today's date
+    today = datetime.now().date()
 
-    # Process activities
+    # Process only today's activities
     for activity in activities:
-        activity_id = activity.get('activityId', '')
-        if activity_id <= last_sync_id:
-            continue
-        
+        # Convert the activity date string to a datetime object
+        activity_date = datetime.fromisoformat(activity.get('startTimeLocal')).date()
+
+        # Check if the activity date is today
+        if activity_date != today:
+            continue  # Skip activities that are not from today
+
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = activity.get('activityName', 'Unnamed Activity')
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
-        calories = activity.get('activeKilocalories', 0)
+        calories = activity.get('calories', 0)
         activity_date = activity.get('startTimeLocal', datetime.now().isoformat())
         average_speed = activity.get('averageSpeed', 0)
         avg_pace = format_pace(average_speed)
