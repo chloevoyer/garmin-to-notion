@@ -71,10 +71,12 @@ def main():
         print(f"Error connecting to Notion: {e}")
         return
 
-    # Fetch activities
+    # Fetch activities (increase the range to ensure we fetch enough data)
     try:
-        activities = garmin.get_activities(0, 10)
+        activities = garmin.get_activities(0, 50)  # Fetch more activities
         print(f"Fetched {len(activities)} activities from Garmin.")
+        for activity in activities:  # Print all activities to inspect their details
+            print(activity)
     except Exception as e:
         print(f"Error fetching activities from Garmin: {e}")
         return
