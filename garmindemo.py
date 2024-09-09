@@ -1,20 +1,39 @@
-import os
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timezone
 from garminconnect import Garmin
 from notion_client import Client
-import pytz
+import pytz  
 
-# Convert the current UTC time to Montreal timezone
-utc_time = datetime.now(pytz.utc)
-montreal_time = utc_time.astimezone(pytz.timezone('America/Montreal'))
-print(f"Current time in Montreal: {montreal_time}")
+# Your local time zone, replace with the appropriate one if needed
+local_tz = pytz.timezone('America/Toronto')
+
+def get_todays_activities(garmin):
+    # Fetch recent activities, adjust the count if needed
+    activities = garmin.get_activities(0, 10)
+
+    # Get today's date in your local time zone
+    today = datetime.now(local_tz).date()
+
+    # Filter activities that occurred today in your local time zone
+    todays_activities = [
+        activity for activity in activities
+        if datetime.strptime(activity['startTimeGMT'], "%Y-%m-%d %H:%M:%S")
+        .replace(tzinfo=timezone.utc)
+        .astimezone(local_tz)
+        .date() == today
+    ]
+
+    return todays_activities
 
 def format_activity_type(activity_type):
-    """Formats the activity type to be capitalized and removes underscores."""
     return activity_type.replace('_', ' ').title()
 
+def format_entertainment(activity_name):
+    return activity_name.replace('ENTERTAINMENT', 'Netflix')
+
+def format_training_effect(trainingEffect_label):
+    return trainingEffect_label.replace('_', ' ').title()
+
 def format_pace(average_speed):
-    """Converts average speed (m/s) to pace (min/km) and formats it as a string."""
     if average_speed > 0:
         pace_min_km = 1000 / (average_speed * 60)  # Convert to min/km
         minutes = int(pace_min_km)
@@ -22,26 +41,32 @@ def format_pace(average_speed):
         return f"{minutes}:{seconds:02d} min/km"
     else:
         return ""
+    
+sept_page_id = '5637b9b2de864a6a8a05a23368dfbb81'
 
-def write_row(client, database_id, activity_type, activity_name, distance, duration, calories, activity_date, avg_pace):
-    """Writes a row to the Notion database with the specified activity details."""
-    print(f"Attempting to write to Notion: {activity_name}, Date: {activity_date}")
-    try:
-        client.pages.create(
-            parent={"database_id": database_id},
-            properties={
-                "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-                "Activity Type": {"select": {"name": activity_type}},
-                "Distance (km)": {"number": distance},
-                "Duration (min)": {"number": duration},
-                "Calories": {"number": calories},
-                "Date": {"date": {"start": activity_date}},
-                "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]}
-            }
-        )
-        print(f"Successfully written: {activity_name}")
-    except Exception as e:
-        print(f"Failed to write to Notion: {e}")
+def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace, 
+              aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label, 
+              pr_status):
+    """
+    Writes a row to the Notion database with the specified activity details.
+    """
+    client.pages.create(
+        parent={"database_id": database_id},
+        properties={
+            "Date": {"date": {"start": activity_date}},
+            "Activity Type": {"select": {"name": activity_type}},
+            "Activity Name": {"title": [{"text": {"content": activity_name}}]},
+            "Distance (km)": {"number": distance},
+            "Duration (min)": {"number": duration},
+            "Calories": {"number": calories},
+            "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]},
+            "Aerobic": {"number": aerobic_TrainingEffect},
+            "Anaerobic": {"number": anaerobic_TrainingEffect},
+            "Training Effect": {"select": {"name": trainingEffect_label}},
+            "Month": {"relation": [{"id": sept_page_id}]},
+            "PR": {"checkbox": pr_status}  # Adds the PR status as a checkbox
+        }
+    )
 
 def main():
     # Initialize Garmin and Notion clients using environment variables
@@ -49,69 +74,47 @@ def main():
     garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
+    relation_id = os.getenv("NOTION_RL_ID")
+    
+    # Initialize Garmin client and login
+    garmin = Garmin(email, password)
+    garmin.login()
 
-    # Check for missing environment variables
-    if not garmin_email or not garmin_password or not notion_token or not database_id:
-        print("Error: Missing one or more environment variables.")
-        return
+    # Initialize Notion client with the correct token
+    client = Client(auth=NOTION_TOKEN)
 
-    # Initialize Garmin and Notion clients
-    try:
-        garmin = Garmin(garmin_email, garmin_password)
-        garmin.login()
-        print("Logged in to Garmin successfully.")
-    except Exception as e:
-        print(f"Error logging into Garmin: {e}")
-        return
+    # Fetch activities (0, 100) is a range; you may adjust it if needed.
+    # activities = garmin.get_activities(0, 5)
+    # print(activities)
 
-    try:
-        client = Client(auth=notion_token)
-        print("Connected to Notion successfully.")
-    except Exception as e:
-        print(f"Error connecting to Notion: {e}")
-        return
+    # Get today's activities
+    todays_activities = get_todays_activities(garmin)
+    print("Today's Activities:", todays_activities)
 
-    # Fetch activities without filtering dates to see all available data
-    try:
-        activities = garmin.get_activities(0, 1000)  # Increase the range to capture more data
-        print(f"Fetched {len(activities)} activities from Garmin.")
-        if len(activities) == 0:
-            print("No activities were fetched. Ensure there are activities to retrieve and that permissions are correct.")
-        else:
-            for activity in activities:
-                # Print the raw activity data for debugging purposes
-                print("Raw activity data:", activity)
+    # Process only today's activities
+    for activity in todays_activities:
+        activity_date = activity.get('startTimeGMT')
+        activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
+        activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
+        distance_km = round(activity.get('distance', 0) / 1000, 2)
+        duration_minutes = round(activity.get('duration', 0) / 60, 2)
+        calories = activity.get('calories', 0)
+        average_speed = activity.get('averageSpeed', 0)
+        avg_pace = format_pace(average_speed)
+        aerobic_TrainingEffect = round(activity.get('aerobicTrainingEffect', 0), 2)
+        anaerobic_TrainingEffect = round(activity.get('anaerobicTrainingEffect', 0), 2)
+        trainingEffect_label = format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))
+        pr_status = activity.get('pr', False) 
 
-                # Extract and print the start time to ensure correct date parsing
-                start_time = activity.get('startTimeLocal', 'N/A')
-                print(f"Activity Start Time: {start_time}")
+        # Write to Notion
+        try:
+            write_row(client, DB_ID, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace, 
+                      aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label, 
+                      pr_status)
+            print(f"Successfully written: {activity_type} - {activity_name}")
+        except Exception as e:
+            print(f"Failed to write to Notion: {e}")
 
-                # Extract date to check alignment with today's date
-                activity_date = datetime.fromisoformat(start_time).date() if start_time != 'N/A' else None
-                if activity_date:
-                    print(f"Parsed Activity Date: {activity_date}")
-                else:
-                    print("Error parsing activity date.")
-
-                # Check if activity date matches today's date
-                if activity_date != montreal_time.date():
-                    print(f"Skipping activity on {activity_date} as it is not today.")
-                    continue
-
-                # Extract and process activity details
-                activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
-                activity_name = activity.get('activityName', 'Unnamed Activity')
-                distance_km = round(activity.get('distance', 0) / 1000, 2)
-                duration_minutes = round(activity.get('duration', 0) / 60, 2)
-                calories = activity.get('activeKilocalories', 0)
-                average_speed = activity.get('averageSpeed', 0)
-                avg_pace = format_pace(average_speed)
-
-                # Attempt to write to Notion
-                write_row(client, database_id, activity_type, activity_name, distance_km, duration_minutes, calories, str(activity_date), avg_pace)
-
-    except Exception as e:
-        print(f"Error fetching activities from Garmin: {e}")
 
 if __name__ == '__main__':
     main()
