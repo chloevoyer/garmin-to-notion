@@ -78,11 +78,9 @@ def main():
     relation_id = os.getenv("NOTION_RL_ID")
     
     # Initialize Garmin client and login
-    garmin = Garmin(email, password)
+    garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
-
-    # Initialize Notion client with the correct token
-    client = Client(auth=NOTION_TOKEN)
+    client = Client(auth=notion_token)
 
     # Fetch activities (0, 100) is a range; you may adjust it if needed.
     # activities = garmin.get_activities(0, 5)
