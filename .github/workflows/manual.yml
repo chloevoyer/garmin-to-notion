@@ -28,5 +28,7 @@ jobs:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
           NOTION_PG_ID: ${{ secrets.NOTION_PG_ID }}
+          NOTION_RL_ID: ${{ secrets.NOTION_RL_ID }}
         run: |
           python garmindemo.py
+        
