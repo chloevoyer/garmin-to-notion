@@ -106,7 +106,7 @@ def main():
 
         # Write to Notion
         try:
-            write_row(client, DB_ID, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace, 
+            write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
                       aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label, 
                       pr_status)
             print(f"Successfully written: {activity_type} - {activity_name}")
