@@ -1,7 +1,7 @@
 from datetime import date, datetime, timezone
 from garminconnect import Garmin
 from notion_client import Client
-import pytz  
+import pytz
 import os
 
 # Your local time zone, replace with the appropriate one if needed
@@ -42,10 +42,10 @@ def format_pace(average_speed):
         return f"{minutes}:{seconds:02d} min/km"
     else:
         return ""
-    
-def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace, 
-              aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label, 
-              pr_status):
+
+def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace,
+              aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label,
+              pr_status, relation_id):
     """
     Writes a row to the Notion database with the specified activity details.
     """
@@ -61,9 +61,9 @@ def write_row(client, database_id, activity_date, activity_type, activity_name, 
             "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]},
             "Aerobic": {"number": aerobic_TrainingEffect},
             "Anaerobic": {"number": anaerobic_TrainingEffect},
-            "Training Effect": {"select": {"name": trainingEffect_label}}, 
-            "Month": {"relation": [{"id": relation_id}]}, 
-            "PR": {"checkbox": pr_status}  
+            "Training Effect": {"select": {"name": trainingEffect_label}},
+            "Month": {"relation": [{"id": relation_id}]},
+            "PR": {"checkbox": pr_status}
         }
     )
 
@@ -74,7 +74,7 @@ def main():
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
     relation_id = os.getenv("NOTION_RL_ID")
-    
+
     # Initialize Garmin client and login
     garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
@@ -102,13 +102,13 @@ def main():
         aerobic_TrainingEffect = round(activity.get('aerobicTrainingEffect', 0), 2)
         anaerobic_TrainingEffect = round(activity.get('anaerobicTrainingEffect', 0), 2)
         trainingEffect_label = format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))
-        pr_status = activity.get('pr', False) 
+        pr_status = activity.get('pr', False)
 
         # Write to Notion
         try:
             write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
-                      aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label, 
-                      pr_status)
+                      aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label,
+                      pr_status, relation_id)
             print(f"Successfully written: {activity_type} - {activity_name}")
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
