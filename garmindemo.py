@@ -2,6 +2,7 @@ from datetime import date, datetime, timezone
 from garminconnect import Garmin
 from notion_client import Client
 import pytz  
+import os
 
 # Your local time zone, replace with the appropriate one if needed
 local_tz = pytz.timezone('America/Toronto')
