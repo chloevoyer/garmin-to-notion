@@ -26,8 +26,8 @@ Ensure that your environment secrets are correctly configured for secure data ac
 ## Example Configuration
 You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.  
 
-Here is a screenshot of what my Notion dashboard looks like: 
-![garmin-to-notion_demo](https://github.com/user-attachments/assets/b0881255-9967-4493-801e-ac92007c478a)
+Here is a screenshot of what my Notion dashboard looks like:  
+![garmin-to-notion_demo](https://github.com/user-attachments/assets/b398c896-1142-41ac-bc4b-687b6641c50f)
 
 ## Acknowledgements
 - Reference dictionary and examples can be found in [cyberjunky/python-garminconnect](https://github.com/cyberjunky/python-garminconnect.git).
