@@ -29,10 +29,10 @@ You can customize the scripts to fit your needs by modifying environment variabl
 Here is a screenshot of what my Notion dashboard looks like:  
 ![garmin-to-notion_demo](https://github.com/user-attachments/assets/b398c896-1142-41ac-bc4b-687b6641c50f)
 
-## Acknowledgements :handshake:
+## Acknowledgements :raised_hands:  
 - Reference dictionary and examples can be found in [cyberjunky/python-garminconnect](https://github.com/cyberjunky/python-garminconnect.git).
 - This project was inspired by [n-kratz/garmin-notion](https://github.com/n-kratz/garmin-notion.git).
-## Contributing  
+## Contributing :handshake:   
 Contributions are welcome! If you find a bug or want to add a feature, feel free to open an issue or submit a pull request. Financial contributions are also greatly appreciated :blush:    
 
 <a href="https://www.buymeacoffee.com/cvoyer" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>   
