@@ -61,9 +61,9 @@ def write_row(client, database_id, activity_date, activity_type, activity_name, 
             "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]},
             "Aerobic": {"number": aerobic_TrainingEffect},
             "Anaerobic": {"number": anaerobic_TrainingEffect},
-            "Training Effect": {"select": {"name": trainingEffect_label}},
-            "Month": {"relation": [{"id": relation_id}]},
-            "PR": {"checkbox": pr_status}  # Adds the PR status as a checkbox
+            "Training Effect": {"select": {"name": trainingEffect_label}}, 
+            "Month": {"relation": [{"id": relation_id}]}, 
+            "PR": {"checkbox": pr_status}  
         }
     )
 
@@ -80,9 +80,10 @@ def main():
     garmin.login()
     client = Client(auth=notion_token)
 
-    # Fetch activities (0, 100) is a range; you may adjust it if needed.
-    # activities = garmin.get_activities(0, 5)
-    # print(activities)
+    # This is only used to initialize all Garmin activities in my database, but I only sync today's event regularly
+        # Fetch activities (0, 100) is a range; you may adjust it if needed.
+        # activities = garmin.get_activities(0, 5)
+        # print(activities)
 
     # Get today's activities
     todays_activities = get_todays_activities(garmin)
