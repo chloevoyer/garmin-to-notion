@@ -32,6 +32,7 @@ python personal-records.py
 - Reference dictionary and examples can be found in [cyberjunky/python-garminconnect](https://github.com/cyberjunky/python-garminconnect.git).
 - This project was inspired by [n-kratz/garmin-notion](https://github.com/n-kratz/garmin-notion.git).
 ## Contributing
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/cvoyer)  
 Contributions are welcome! If you find a bug or want to add a feature, feel free to open an issue or submit a pull request.
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
