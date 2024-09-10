@@ -43,8 +43,6 @@ def format_pace(average_speed):
     else:
         return ""
     
-sept_page_id = '5637b9b2de864a6a8a05a23368dfbb81'
-
 def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace, 
               aerobic_TrainingEffect, anaerobic_TrainingEffect, trainingEffect_label, 
               pr_status):
@@ -64,7 +62,7 @@ def write_row(client, database_id, activity_date, activity_type, activity_name, 
             "Aerobic": {"number": aerobic_TrainingEffect},
             "Anaerobic": {"number": anaerobic_TrainingEffect},
             "Training Effect": {"select": {"name": trainingEffect_label}},
-            "Month": {"relation": [{"id": sept_page_id}]},
+            "Month": {"relation": [{"id": relation_id}]},
             "PR": {"checkbox": pr_status}  # Adds the PR status as a checkbox
         }
     )
