@@ -1,0 +1,4 @@
+garminconnect==0.2.19
+notion-client==2.2.1
+pytz==2024.1
+datetime==5.5
