@@ -24,7 +24,10 @@ Ensure that your environment secrets are correctly configured for secure data ac
 * Run [person-records.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/personal-records.py) to extract activity records (e.g., fastest run, longest ride).  
 `python personal-records.py` 
 ## Example Configuration
-You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.
+You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.  
+
+Here is a screenshot of what my Notion dashboard looks like: 
+![garmin-to-notion_demo](https://github.com/user-attachments/assets/b0881255-9967-4493-801e-ac92007c478a)
 
 ## Acknowledgements
 - Reference dictionary and examples can be found in [cyberjunky/python-garminconnect](https://github.com/cyberjunky/python-garminconnect.git).
