@@ -39,7 +39,7 @@ Contributions are welcome! If you find a bug or want to add a feature, feel free
 
 <a href="https://www.buymeacoffee.com/cvoyer" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>   
 
-## License :copyright:  
+## :copyright: License  
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
 
