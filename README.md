@@ -29,6 +29,8 @@ You can customize the scripts to fit your needs by modifying environment variabl
 Here is a screenshot of what my Notion dashboard looks like:  
 ![garmin-to-notion_demo](https://github.com/user-attachments/assets/b398c896-1142-41ac-bc4b-687b6641c50f)
 
+My Notion template is available for free and can be duplicated to your Notion (here)[https://www.notion.so/chloevoyer/Fitness-Tracker-Template-4b4ce8b4f0c349228605382be3c5623b?pvs=4]
+
 ## Acknowledgements :raised_hands:  
 - Reference dictionary and examples can be found in [cyberjunky/python-garminconnect](https://github.com/cyberjunky/python-garminconnect.git).
 - This project was inspired by [n-kratz/garmin-notion](https://github.com/n-kratz/garmin-notion.git).
