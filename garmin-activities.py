@@ -25,6 +25,8 @@ def get_todays_activities(garmin):
     return todays_activities
 
 def format_text(text: str) -> str:
+    if not text:
+        return ''  # Or return 'No training effect' or any other default message
     return text.replace('_', ' ').title()
 
 def format_entertainment(activity_name):
