@@ -24,14 +24,11 @@ def get_todays_activities(garmin):
     ]
     return todays_activities
 
-def format_activity_type(activity_type):
-    return activity_type.replace('_', ' ').title()
+def format_text(text: str) -> str:
+    return text.replace('_', ' ').title()
 
 def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
-
-def format_training_effect(trainingEffect_label):
-    return trainingEffect_label.replace('_', ' ').title()
 
 def format_pace(average_speed):
     if average_speed > 0:
@@ -43,7 +40,7 @@ def format_pace(average_speed):
         return ""
 
 def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace,
-              aerobic, anaerobic, trainingEffect_label,
+              aerobic, anaerobic, trainingEffect,
               pr_status, relation_id):
     """
     Writes a row to the Notion database with the specified activity details.
@@ -60,7 +57,7 @@ def write_row(client, database_id, activity_date, activity_type, activity_name, 
             "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]},
             "Aerobic": {"number": aerobic},
             "Anaerobic": {"number": anaerobic},
-            "Training Effect": {"select": {"name": trainingEffect_label}},
+            "Training Effect": {"select": {"name": trainingEffect}},
             "Month": {"relation": [{"id": relation_id}]},
             "PR": {"checkbox": pr_status}
         }
@@ -86,12 +83,15 @@ def main():
 
     # Get today's activities
     todays_activities = get_todays_activities(garmin)
-    print("Today's Activities:", todays_activities)
+    if not todays_activities:
+        logging.info("No activities found for today.")
+        return
+    # print("Today's Activities:", todays_activities)
 
     # Process only today's activities
     for activity in todays_activities:
         activity_date = activity.get('startTimeGMT')
-        activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
+        activity_type = format_text(activity.get('activityType', {}).get('typeKey', ''))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
@@ -100,13 +100,13 @@ def main():
         avg_pace = format_pace(average_speed)
         aerobic = round(activity.get('aerobicTrainingEffect', 0), 2)
         anaerobic = round(activity.get('anaerobicTrainingEffect', 0), 2)
-        trainingEffect_label = format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))
+        trainingEffect = format_text(activity.get('trainingEffectLabel', ''))
         pr_status = activity.get('pr', False)
 
         # Write to Notion
         try:
             write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
-                      aerobic, anaerobic, trainingEffect_label,
+                      aerobic, anaerobic, trainingEffect,
                       pr_status, relation_id)
             print(f"Successfully written: {activity_type} - {activity_name}")
         except Exception as e:
