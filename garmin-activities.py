@@ -9,20 +9,20 @@ local_tz = pytz.timezone('America/Toronto')
 
 def get_todays_activities(garmin):
     # Fetch recent activities, adjust the count if needed
-    all_activities = garmin.get_activities(0, 10)
+    activities = garmin.get_activities(0, 10)
 
     # Get today's date in your local time zone
     today = datetime.now(local_tz).date()
 
     # Filter activities that occurred today in your local time zone
-    all_activities = [
+    todays_activities = [
         activity for activity in activities
         if datetime.strptime(activity['startTimeGMT'], "%Y-%m-%d %H:%M:%S")
         .replace(tzinfo=timezone.utc)
         .astimezone(local_tz)
         .date() == today
     ]
-    return activities
+    return todays_activities
 
 def format_activity_type(activity_type):
     return activity_type.replace('_', ' ').title()
@@ -85,11 +85,11 @@ def main():
         # print(activities)
 
     # Get today's activities
-    activities = get_todays_activities(garmin)
-    print("Today's Activities:", activities)
+    todays_activities = get_todays_activities(garmin)
+    print("Today's Activities:", todays_activities)
 
     # Process only today's activities
-    for activity in activities:
+    for activity in todays_activities:
         activity_date = activity.get('startTimeGMT')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
