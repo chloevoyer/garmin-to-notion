@@ -84,8 +84,7 @@ def main():
     # Get today's activities
     todays_activities = get_todays_activities(garmin)
     if not todays_activities:
-        logging.info("No activities found for today.")
-        return
+        return "No activities found for today."
     # print("Today's Activities:", todays_activities)
 
     # Process only today's activities
