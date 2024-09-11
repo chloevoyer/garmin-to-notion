@@ -4,7 +4,7 @@ from notion_client import Client
 import pytz
 import os
 
-# Your local time zone, replace with the appropriate one if needed
+# Replace with your local time zone if needed
 local_tz = pytz.timezone('America/Toronto')
 
 def get_todays_activities(garmin):
@@ -26,7 +26,7 @@ def get_todays_activities(garmin):
 
 def format_text(text: str) -> str:
     if not text:
-        return ''  # Or return 'No training effect' or any other default message
+        return ''  # Or return 'No training effect' or any other default message you want
     return text.replace('_', ' ').title()
 
 def format_entertainment(activity_name):
@@ -109,7 +109,7 @@ def main():
             write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
                       aerobic, anaerobic, trainingEffect,
                       pr_status, relation_id)
-            print(f"Successfully written: {activity_type} - {activity_name}")
+            # print(f"Successfully written: {activity_type} - {activity_name}")
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
 
