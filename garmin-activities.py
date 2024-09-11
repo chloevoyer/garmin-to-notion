@@ -99,7 +99,7 @@ def main():
         avg_pace = format_pace(average_speed)
         aerobic = round(activity.get('aerobicTrainingEffect', 0), 2)
         anaerobic = round(activity.get('anaerobicTrainingEffect', 0), 2)
-        trainingEffect = format_text(activity.get('trainingEffectLabel', ''))
+        trainingEffect = format_text(activity.get('trainingEffectLabel', 'Unknown'))
         pr_status = activity.get('pr', False)
 
         # Write to Notion
