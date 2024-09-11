@@ -1,3 +1,4 @@
+[![Sync Garmin to Notion](https://github.com/chloevoyer/garmin-to-notion/actions/workflows/manual.yml/badge.svg?branch=main)](https://github.com/chloevoyer/garmin-to-notion/actions/workflows/manual.yml)
 # Garmin to Notion Integration :watch:
 This project connects your Garmin activities and personal records to your Notion database, allowing you to keep track of your performance metrics in one place.
 
