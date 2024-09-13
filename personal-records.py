@@ -180,9 +180,7 @@ def main():
     client = Client(auth=notion_token)
 
     records = garmin.get_personal_record()
-    print("Personal Records:", records)
     filtered_records = [record for record in records if record.get('typeId') != 16]
-    print("New Personal Records:", filtered_records)
 
     for record in filtered_records:
         activity_date = record.get('prStartTimeGmtFormatted')
