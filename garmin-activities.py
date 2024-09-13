@@ -116,14 +116,14 @@ def main():
     client = Client(auth=notion_token)
     
     # Run once to initialize all Garmin activities in database, then comment out. 
-    activities = garmin.get_activities(0, 1000) # Fetch activities (0, 1000) is a range; you may adjust it if needed.
+    # activities = garmin.get_activities(0, 1000) # Fetch activities (0, 1000) is a range; you may adjust it if needed.
 
     # Get today's activities
-    # todays_activities = get_todays_activities(garmin)
+    todays_activities = get_todays_activities(garmin)
     # print("Today's Activities:", todays_activities)
 
     # Process only today's activities
-    for activity in activities: # replace with 'activities' if importing data into Notion database for the first time
+    for activity in todays_activities: # replace with 'activities' if importing data into Notion database for the first time
         activity_date = activity.get('startTimeGMT')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
