@@ -132,7 +132,7 @@ def get_existing_record(client, database_id, activity_name):
         database_id=database_id,
         filter={
             "and": [
-                {"property": "Activity Name", "title": {"equals": activity_name}},
+                {"property": "Record", "title": {"equals": activity_name}},
                 {"property": "PR", "checkbox": {"equals": True}}
             ]
         }
@@ -145,7 +145,7 @@ def get_existing_record(client, database_id, activity_name):
         database_id=database_id,
         filter={
             "and": [
-                {"property": "Activity Name", "title": {"equals": activity_name}},
+                {"property": "Record", "title": {"equals": activity_name}},
                 {"property": "PR", "checkbox": {"equals": True}}
             ]
         }
@@ -157,7 +157,7 @@ def get_record_by_date_and_name(client, database_id, activity_date, activity_nam
         database_id=database_id,
         filter={
             "and": [
-                {"property": "Activity Name", "title": {"equals": activity_name}},
+                {"property": "Record", "title": {"equals": activity_name}},
                 {"property": "Date", "date": {"equals": activity_date}}
             ]
         }
@@ -188,7 +188,7 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
     properties = {
         "Date": {"date": {"start": activity_date}},
         "Activity Type": {"select": {"name": activity_type}},
-        "Activity Name": {"title": [{"text": {"content": activity_name}}]},
+        "Record": {"title": [{"text": {"content": activity_name}}]},
         "typeId": {"number": typeId},
         "PR": {"checkbox": True}
     }
