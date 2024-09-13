@@ -122,7 +122,7 @@ def main():
         try:
             write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
                       aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
-                      pr_status)
+                      pr_status, relation_id)
             print(f"Successfully written: {activity_type} - {activity_name}")
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
