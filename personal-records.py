@@ -100,6 +100,31 @@ def get_existing_record(client, database_id, activity_name):
     )
     return query['results'][0] if query['results'] else None
 
+
+def get_existing_record(client, database_id, activity_name):
+    query = client.databases.query(
+        database_id=database_id,
+        filter={
+            "and": [
+                {"property": "Activity Name", "title": {"equals": activity_name}},
+                {"property": "PR", "checkbox": {"equals": True}}
+            ]
+        }
+    )
+    return query['results'][0] if query['results'] else None
+
+def get_record_by_date_and_name(client, database_id, activity_date, activity_name):
+    query = client.databases.query(
+        database_id=database_id,
+        filter={
+            "and": [
+                {"property": "Activity Name", "title": {"equals": activity_name}},
+                {"property": "Date", "date": {"equals": activity_date}}
+            ]
+        }
+    )
+    return query['results'][0] if query['results'] else None
+
 def update_record(client, page_id, activity_date, value, pace, is_pr=True):
     properties = {
         "Date": {"date": {"start": activity_date}},
@@ -164,13 +189,18 @@ def main():
         typeId = record.get('typeId', 0)
         value, pace = format_garmin_value(record.get('value', 0), activity_type, typeId)
 
-        existing_record = get_existing_record(client, database_id, activity_name)
+        existing_pr_record = get_existing_record(client, database_id, activity_name)
+        existing_date_record = get_record_by_date_and_name(client, database_id, activity_date, activity_name)
 
-        if existing_record:
-            existing_date = existing_record['properties']['Date']['date']['start']
+        if existing_date_record:
+            # Update the existing record for this date and activity
+            update_record(client, existing_date_record['id'], activity_date, value, pace, True)
+            print(f"Updated existing record: {activity_type} - {activity_name}")
+        elif existing_pr_record:
+            existing_date = existing_pr_record['properties']['Date']['date']['start']
             if activity_date > existing_date:
                 # Archive old record
-                update_record(client, existing_record['id'], existing_date, None, None, False)
+                update_record(client, existing_pr_record['id'], existing_date, None, None, False)
                 print(f"Archived old record: {activity_type} - {activity_name}")
                 
                 # Create new PR record
