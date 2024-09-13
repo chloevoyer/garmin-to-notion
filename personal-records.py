@@ -145,7 +145,7 @@ def update_record(client, page_id, activity_date, value, pace, is_pr=True):
     except Exception as e:
         print(f"Error updating record: {e}")
 
-def write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace):
+def write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace, seconds):
     properties = {
         "Date": {"date": {"start": activity_date}},
         "Activity Type": {"select": {"name": activity_type}},
@@ -188,6 +188,7 @@ def main():
         activity_name = replace_activity_name_by_typeId(record.get('typeId'))
         typeId = record.get('typeId', 0)
         value, pace = format_garmin_value(record.get('value', 0), activity_type, typeId)
+        seconds = record.get('value', 0)
 
         existing_pr_record = get_existing_record(client, database_id, activity_name)
         existing_date_record = get_record_by_date_and_name(client, database_id, activity_date, activity_name)
@@ -204,13 +205,13 @@ def main():
                 print(f"Archived old record: {activity_type} - {activity_name}")
                 
                 # Create new PR record
-                write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
+                write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace, seconds)
                 print(f"Created new PR record: {activity_type} - {activity_name}")
             else:
                 print(f"No update needed: {activity_type} - {activity_name}")
         else:
             # New record
-            write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
+            write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace, seconds)
             print(f"Successfully written new record: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
