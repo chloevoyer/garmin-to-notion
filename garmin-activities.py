@@ -31,12 +31,17 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_parentTypeId(parentTypeId):
+    return parentTypeId.replace('1', 'Running')
     return parentTypeId.replace('2', 'Cycling')
-
+    
 def format_aerobicmessage(aerobicTrainingEffectMessage):
-    return aerobicTrainingEffectMessage.replace('NO_ANAEROBIC_BENEFIT_0', 'No Benefit')
+    return aerobicTrainingEffectMessage.replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
     return aerobicTrainingEffectMessage.replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
     return aerobicTrainingEffectMessage.replace('IMPACTING_TEMPO_22', 'Impacting')
+    
+def format_anaerobicmessage(anaerobicTrainingEffectMessage):
+    return anaerobicTrainingEffectMessage.replace('NO_ANAEROBIC_BENEFIT_0', 'No Benefit')
+    return anaerobicTrainingEffectMessage.replace('MAINTAINING_ANAEROBIC_FITNESS_1', 'Maintaining')
 
 def format_training_effect(trainingEffect_label):
     return trainingEffect_label.replace('_', ' ').title()
@@ -113,7 +118,7 @@ def main():
         aerobic = round(activity.get('aerobicTrainingEffect', 1))
         anaerobic = round(activity.get('anaerobicTrainingEffect', 1))
         aerobicTrainingEffectMessage = format_aerobicmessage(activity.get('aerobicTrainingEffectMessage', 'Unknown'))
-        anaerobicTrainingEffectMessage = format_aerobicmessage(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))
+        anaerobicTrainingEffectMessage = format_anaerobicmessage(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))
         trainingEffect_label = format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))
         pr_status = activity.get('pr', False)
 
