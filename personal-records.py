@@ -32,14 +32,14 @@ def format_garmin_value(value, activity_type, typeId):
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         formatted_value = f"{minutes}:{seconds:02d}"
-        total_pseconds = round(value * 1.60934)
+        total_pseconds = total_seconds * 1.60934
         pminutes = total_pseconds // 60
         pseconds = total_pseconds % 60
         formatted_pace = f"{pminutes}:{pseconds:02d}"
         return formatted_value, formatted_pace
 
     if typeId == 3:  # 5K
-        total_seconds = round(value)  # Round to the nearest second
+        total_seconds = round(value) 
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         formatted_value = f"{minutes}:{seconds:02d}"
@@ -52,30 +52,18 @@ def format_garmin_value(value, activity_type, typeId):
     if typeId == 4:  # 10K
         # Round to the nearest second
         total_seconds = round(value)
-
-        # Calculate hours, minutes, and seconds
         hours = total_seconds // 3600
         minutes = (total_seconds % 3600) // 60
         seconds = total_seconds % 60
-
-        # Format the total time with hours if applicable
         if hours > 0:
             formatted_value = f"{hours}:{minutes:02d}:{seconds:02d}"
         else:
             formatted_value = f"{minutes}:{seconds:02d}"
-
-        # Calculate the pace per km
         total_pseconds = total_seconds // 10  # Divide by 10km
         phours = total_pseconds // 3600
         pminutes = (total_pseconds % 3600) // 60
         pseconds = total_pseconds % 60
-
-        # Format the pace with hours if applicable
-        if phours > 0:
-            formatted_pace = f"{phours}:{pminutes:02d}:{pseconds:02d}"
-        else:
-            formatted_pace = f"{pminutes}:{pseconds:02d}"
-
+        formatted_pace = f"{pminutes}:{pseconds:02d}"
         return formatted_value, formatted_pace
 
     if typeId in [7, 8]:  # Longest Run, Longest Ride
