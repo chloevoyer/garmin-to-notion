@@ -123,7 +123,7 @@ def main():
     # Notion integration credentials
     garmin_email = os.getenv("GARMIN_EMAIL")
     garmin_password = os.getenv("GARMIN_PASSWORD")
-    notion_token = os.getenv("NOTION_PR_TOKEN")
+    notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_PR_DB_ID")
 
     # Initialize Garmin client and login
