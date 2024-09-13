@@ -30,50 +30,25 @@ def format_activity_type(activity_type):
 def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
-def format_aerobicmessage(aerobicTrainingEffectMessage):
-    return (aerobicTrainingEffectMessage
-            .replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
-            .replace('NO_AEROBIC_BENEFIT_18', 'No Benefit')
-            .replace('RECOVERY_5', 'Recovery')
-            .replace('MINOR_AEROBIC_BENEFIT_0', 'Some Benefit')
-            .replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
-            .replace('MAINTAINING_TEMPO_21', 'Maintaining')               
-            .replace('MAINTAINING_AEROBIC_BASE_7', 'Impacting')
-            .replace('IMPROVING_VO2_MAX_15', 'Impacting')
-            .replace('IMPROVING_VO2_MAX_15', 'Impacting')
-            .replace('IMPROVING_AEROBIC_BASE_8', 'Impacting')
-            .replace('IMPROVING_LACTATE_THRESHOLD_12', 'Impacting')
-            .replace('IMPROVING_AEROBIC_FITNESS_2', 'Impacting')
-            .replace('IMPACTING_TEMPO_22', 'Impacting')
-            .replace('HIGHLY_IMPROVING_AEROBIC_FITNESS_3', 'Highly Impacting')
-            .replace('HIGHLY_IMPACTING_TEMPO_23', 'Highly Impacting')
-            .replace('HIGHLY_IMPROVING_VO2_MAX_16', 'Highly Impacting')
-            .replace('HIGHLY_IMPROVING_LACTATE_THRESHOLD_13', 'Highly Impacting')
-            .replace('OVERREACHING_17', 'Overreaching')
-           )
-
-def format_anaerobicmessage(anaerobicTrainingEffectMessage):
-    return (anaerobicTrainingEffectMessage
-            .replace('NO_ANAEROBIC_BENEFIT_0', 'No Benefit')
-            .replace('MAINTAINING_ANAEROBIC_FITNESS_1', 'Maintaining')
-            .replace('MAINTAINING_ANAEROBIC_BASE_1', 'Impacting')
-            .replace('RECOVERY_5', 'Recovery')
-            .replace('MAINTAINING_TEMPO_21', 'Maintaining')
-            .replace('RECOVERY_5', 'Recovery')
-            .replace('MINOR_ANAEROBIC_BENEFIT_0', 'Some Benefit')
-            .replace('MINOR_ANAEROBIC_BENEFIT_15', 'Some Benefit')
-            .replace('MAINTAINING_ANAEROBIC_POWER_7', 'Maintaining')               
-            .replace('MAINTAINING_ECONOMY_AND_ANAEROBIC_BASE_10', 'Impacting')
-            .replace('IMPROVING_VO2_MAX_15', 'Impacting')
-            .replace('IMPROVING_ANAEROBIC_BASE_2', 'Impacting')
-            .replace('IMPROVING_LACTATE_THRESHOLD_12', 'Impacting')
-            .replace('IMPROVING_ANAEROBIC_CAPACITY_AND_POWER_8', 'Impacting')
-            .replace('IMPACTING_TEMPO_22', 'Impacting')
-            .replace('HIGHLY_IMPROVING_ANAEROBIC_CAPACITY_AND_POWER_3', 'Highly Impacting')
-            .replace('HIGHLY_IMPROVING_VO2_MAX_16', 'Highly Impacting')
-            .replace('HIGHLY_IMPROVING_LACTATE_THRESHOLD_13', 'Highly Impacting')
-            .replace('OVERREACHING_17', 'Overreaching')
-           )
+def format_training_message(message):
+    if message.startswith('NO_'):
+        return 'No Benefit'
+    elif 'MINOR_' in message:
+        return 'Some Benefit'
+    elif 'RECOVERY_' in message:
+        return 'Recovery'
+    elif 'MAINTAINING_' in message:
+        return 'Maintaining'
+    elif 'IMPROVING_' in message:
+        return 'Improving'
+    elif 'IMPACTING_' in message:
+        return 'Impacting'
+    elif 'HIGHLY_' in message:
+        return 'Highly Impacting'
+    elif 'OVERREACHING_' in message:
+        return 'Overreaching'
+    else:
+        return message  # Return the original message if no match is found
 
 def format_training_effect(trainingEffect_label):
     return trainingEffect_label.replace('_', ' ').title()
@@ -165,8 +140,8 @@ def main():
         avg_pace = format_pace(average_speed)
         aerobic = round(activity.get('aerobicTrainingEffect', 1))
         anaerobic = round(activity.get('anaerobicTrainingEffect', 1))
-        aerobicTrainingEffectMessage = format_aerobicmessage(activity.get('aerobicTrainingEffectMessage', 'Unknown'))
-        anaerobicTrainingEffectMessage = format_anaerobicmessage(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))
+        aerobicTrainingEffectMessage = format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))
+        anaerobicTrainingEffectMessage = format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))
         trainingEffect_label = format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))
         pr_status = activity.get('pr', False)
 
