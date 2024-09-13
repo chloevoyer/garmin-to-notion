@@ -128,7 +128,7 @@ def get_record_by_date_and_name(client, database_id, activity_date, activity_nam
 def update_record(client, page_id, activity_date, value, pace, is_pr=True, seconds):
     properties = {
         "Date": {"date": {"start": activity_date}},
-        "PR": {"checkbox": is_pr}
+        "PR": {"checkbox": is_pr},
         "Seconds": {"number": seconds}
     }
     
