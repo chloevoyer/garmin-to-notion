@@ -31,8 +31,7 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_parentTypeId(parentTypeId):
-    if parentTypeId == 2:
-        return "Cycling"
+    return parentTypeId.replace('2', 'Cycling')
 
 def format_aerobicmessage(aerobicTrainingEffectMessage):
     return aerobicTrainingEffectMessage.replace('NO_ANAEROBIC_BENEFIT_0', 'No Benefit')
