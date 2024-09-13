@@ -126,15 +126,15 @@ def main():
     database_id = os.getenv("NOTION_PR_DB_ID")
 
     # Initialize Garmin client and login
-    garmin = Garmin(email, password)
+    garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
 
     # Initialize Notion client with the correct token
-    client = Client(auth=NOTION_TOKEN)
+    client = Client(auth=notion_token)
 
     records = garmin.get_personal_record()
-    print(records)    
-    print(len(records))  
+    # print(records)    
+    # print(len(records))  
 
     # Filter out records where typeId == 16
     filtered_records = [record for record in records if record.get('typeId') != 16]
