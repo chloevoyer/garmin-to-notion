@@ -30,13 +30,6 @@ def format_activity_type(activity_type):
 def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
-def format_sportTypeId(sportTypeId):
-    mapping = {
-        1: 'Running',
-        2: 'Cycling'
-    }
-    return mapping.get(sportTypeId, sportTypeId)
-
 def format_aerobicmessage(aerobicTrainingEffectMessage):
     return (aerobicTrainingEffectMessage
             .replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
@@ -65,7 +58,7 @@ def format_pace(average_speed):
     else:
         return ""
 
-def write_row(client, database_id, activity_date, sportTypeId, activity_type, activity_name, distance, duration, calories, avg_pace,
+def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace,
               aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
               relation_id, pr_status):
     """
@@ -75,7 +68,6 @@ def write_row(client, database_id, activity_date, sportTypeId, activity_type, ac
         parent={"database_id": database_id},
         properties={
             "Date": {"date": {"start": activity_date}},
-            "Sport Type": {"select": {"name": sportTypeId}},
             "Activity Type": {"select": {"name": activity_type}},
             "Activity Name": {"title": [{"text": {"content": activity_name}}]},
             "Distance (km)": {"number": distance},
@@ -117,7 +109,6 @@ def main():
     # Process only today's activities
     for activity in todays_activities:
         activity_date = activity.get('startTimeGMT')
-        sportTypeId = format_sportTypeId(activity.get('sportTypeId', {}).get('typeKey', 'Unknown'))
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
         distance_km = round(activity.get('distance', 0) / 1000, 2)
@@ -134,7 +125,7 @@ def main():
 
         # Write to Notion
         try:
-            write_row(client, database_id, activity_date, sportTypeId, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
+            write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
                       aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
                       relation_id, pr_status)
             print(f"Successfully written: {activity_type} - {activity_name}")
