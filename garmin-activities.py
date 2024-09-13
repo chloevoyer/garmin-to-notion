@@ -116,11 +116,11 @@ def main():
     
     # This is only used to initialize all Garmin activities in my database. I only sync today's event regularly.
         # Fetch activities (0, 1000) is a range; you may adjust it if needed.
-        activities = garmin.get_activities(0, 1000)
-        print(activities)
+    activities = garmin.get_activities(0, 1000)
+    # print(activities)
 
     # Get today's activities
-    todays_activities = get_todays_activities(garmin)
+    # todays_activities = get_todays_activities(garmin)
     # print("Today's Activities:", todays_activities)
 
     # Process only today's activities
