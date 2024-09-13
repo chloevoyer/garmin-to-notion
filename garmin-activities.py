@@ -121,10 +121,10 @@ def main():
 
     # Get today's activities
     todays_activities = get_todays_activities(garmin)
-    print("Today's Activities:", todays_activities)
+    # print("Today's Activities:", todays_activities)
 
     # Process only today's activities
-    for activity in todays_activities:
+    for activity in activities:
         activity_date = activity.get('startTimeGMT')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
