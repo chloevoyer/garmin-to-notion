@@ -35,12 +35,12 @@ def format_parentTypeId(parentTypeId):
     return parentTypeId.replace('2', 'Cycling')
     
 def format_aerobicmessage(aerobicTrainingEffectMessage):
-    return aerobicTrainingEffectMessage.replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
-    return aerobicTrainingEffectMessage.replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
-    return aerobicTrainingEffectMessage.replace('IMPACTING_TEMPO_22', 'Impacting')
-    return aerobicTrainingEffectMessage.replace('RECOVERY_5', 'Recovery')    
-    return aerobicTrainingEffectMessage.replace('MAINTAINING_TEMPO_21', 'Maintaining')
-    return aerobicTrainingEffectMessage.replace('IMPACTING_TEMPO_22', 'Impacting')
+    return (aerobicTrainingEffectMessage
+            .replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
+            .replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
+            .replace('IMPACTING_TEMPO_22', 'Impacting')
+            .replace('RECOVERY_5', 'Recovery')
+            .replace('MAINTAINING_TEMPO_21', 'Maintaining'))
 
 def format_anaerobicmessage(anaerobicTrainingEffectMessage):
     return anaerobicTrainingEffectMessage.replace('NO_ANAEROBIC_BENEFIT_0', 'No Benefit')
