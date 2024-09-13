@@ -3,85 +3,52 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
-def format_activity_type(activity_type):
-    if activity_type is None:
-        return "Walking"
-    return activity_type.replace('_', ' ').title()
-
-def format_activity_name(activity_name):
-    if not activity_name or activity_name is None:
-        return "Unnamed Activity"
-    return activity_name
-
-def format_entertainment(activity_name):
-    if activity_name is None:
-        return ""
-    return activity_name.replace('ENTERTAINMENT', 'Netflix')
-
-def format_garmin_value(value, activity_type, typeId):
-    # (Keep the existing format_garmin_value function as is)
-    pass
-
-def replace_activity_name_by_typeId(typeId):
-    typeId_name_map = {
-        1: "1K",
-        2: "1mi",
-        3: "5K",
-        4: "10K",
-        7: "Longest Run",
-        8: "Longest Ride",
-        9: "Total Ascent",
-        10: "Max Avg Power (20 min)",
-        12: "Most Steps in a Day",
-        13: "Most Steps in a Week",
-        14: "Most Steps in a Month",
-        15: "Longest Goal Streak"
-    }
-    return typeId_name_map.get(typeId, "Unnamed Activity")
-
-def get_existing_record(client, database_id, activity_name):
-    """
-    Check if a record with the given activity name exists in the Notion database.
-    """
-    query = client.databases.query(
-        database_id=database_id,
-        filter={
-            "and": [
-                {"property": "Activity Name", "title": {"equals": activity_name}},
-                {"property": "PR", "checkbox": {"equals": True}}
-            ]
-        }
-    )
-    return query['results'][0] if query['results'] else None
+# ... (keep all the existing functions up to update_record)
 
 def update_record(client, page_id, activity_date, pr_value, is_pr=True):
     """
     Update an existing record in the Notion database.
     """
-    client.pages.update(
-        page_id=page_id,
-        properties={
-            "Date": {"date": {"start": activity_date}},
-            "Value": {"rich_text": [{"text": {"content": pr_value}}]},
-            "PR": {"checkbox": is_pr}
-        }
-    )
+    properties = {
+        "Date": {"date": {"start": activity_date}},
+        "PR": {"checkbox": is_pr}
+    }
+    
+    # Only update the Value if pr_value is not None and is a non-empty string
+    if pr_value and isinstance(pr_value, str):
+        properties["Value"] = {"rich_text": [{"text": {"content": pr_value}}]}
+    
+    try:
+        client.pages.update(
+            page_id=page_id,
+            properties=properties
+        )
+    except Exception as e:
+        print(f"Error updating record: {e}")
 
 def write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, pr_value):
     """
     Write a new record to the Notion database.
     """
-    client.pages.create(
-        parent={"database_id": database_id},
-        properties={
-            "Date": {"date": {"start": activity_date}},
-            "Activity Type": {"select": {"name": activity_type}},
-            "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-            "typeId": {"number": typeId},
-            "Value": {"rich_text": [{"text": {"content": pr_value}}]},
-            "PR": {"checkbox": True}
-        }
-    )
+    properties = {
+        "Date": {"date": {"start": activity_date}},
+        "Activity Type": {"select": {"name": activity_type}},
+        "Activity Name": {"title": [{"text": {"content": activity_name}}]},
+        "typeId": {"number": typeId},
+        "PR": {"checkbox": True}
+    }
+    
+    # Only add the Value if pr_value is not None and is a non-empty string
+    if pr_value and isinstance(pr_value, str):
+        properties["Value"] = {"rich_text": [{"text": {"content": pr_value}}]}
+    
+    try:
+        client.pages.create(
+            parent={"database_id": database_id},
+            properties=properties
+        )
+    except Exception as e:
+        print(f"Error writing new record: {e}")
 
 def main():
     garmin_email = os.getenv("GARMIN_EMAIL")
@@ -109,12 +76,8 @@ def main():
         if existing_record:
             existing_date = existing_record['properties']['Date']['date']['start']
             if activity_date > existing_date:
-                # New PR: Update the existing record and mark it as PR
-                update_record(client, existing_record['id'], activity_date, pr_value, True)
-                print(f"Updated PR: {activity_type} - {activity_name}")
-                
-                # Archive the old record by unchecking the PR checkbox
-                update_record(client, existing_record['id'], existing_date, existing_record['properties']['Value']['rich_text'][0]['text']['content'], False)
+                # New PR: Update the existing record and mark it as not PR
+                update_record(client, existing_record['id'], existing_date, None, False)
                 print(f"Archived old record: {activity_type} - {activity_name}")
                 
                 # Create a new record for the new PR
@@ -124,11 +87,8 @@ def main():
                 print(f"No update needed: {activity_type} - {activity_name}")
         else:
             # New record: Write to Notion
-            try:
-                write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, pr_value)
-                print(f"Successfully written new record: {activity_type} - {activity_name}")
-            except Exception as e:
-                print(f"Failed to write to Notion: {e}")
+            write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, pr_value)
+            print(f"Successfully written new record: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
     main()
