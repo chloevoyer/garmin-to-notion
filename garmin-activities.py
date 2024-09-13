@@ -36,7 +36,7 @@ def format_aerobicmessage(aerobicTrainingEffectMessage):
             .replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
             .replace('IMPACTING_TEMPO_22', 'Impacting')
             .replace('RECOVERY_5', 'Recovery')
-            .replace('MAINTAINING_TEMPO_21', 'Maintaining'))               
+            .replace('MAINTAINING_TEMPO_21', 'Maintaining')               
             .replace('IMPROVING_VO2_MAX_15', 'Impacting'))
 
 def format_anaerobicmessage(anaerobicTrainingEffectMessage):
