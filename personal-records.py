@@ -3,11 +3,6 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
-from datetime import date, datetime
-from garminconnect import Garmin
-from notion_client import Client
-import os
-
 def format_activity_type(activity_type):
     if activity_type is None:
         return "Walking"
@@ -24,8 +19,57 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_garmin_value(value, activity_type, typeId):
-    # (Keep the existing format_garmin_value function as is)
-    pass
+    # This function now returns a tuple (value, pace)
+    if typeId in [1, 2, 3, 4]:  # Distance-based records
+        minutes = int(value // 60)
+        seconds = round((value / 60 - minutes) * 60, 2)
+        formatted_value = f"{minutes}:{seconds:05.2f}"
+        pace = formatted_value  # For these types, the value is the pace
+        return formatted_value, pace
+
+    if typeId in [7, 8]:  # Longest Run, Longest Ride
+        value_km = value / 1000
+        formatted_value = f"{value_km:.2f} km"
+        pace = ""  # No pace for these types
+        return formatted_value, pace
+
+    if typeId == 9:  # Total Ascent
+        value_m = int(value)
+        formatted_value = f"{value_m:,} m"
+        pace = ""
+        return formatted_value, pace
+
+    if typeId == 10:  # Max Avg Power
+        value_w = round(value)
+        formatted_value = f"{value_w} W"
+        pace = ""
+        return formatted_value, pace
+
+    if typeId in [12, 13, 14]:  # Step counts
+        value_steps = round(value)
+        formatted_value = f"{value_steps:,}"
+        pace = ""
+        return formatted_value, pace
+
+    if typeId == 15:  # Longest Goal Streak
+        value_days = round(value)
+        formatted_value = f"{value_days} days"
+        pace = ""
+        return formatted_value, pace
+
+    # Default case
+    if int(value // 60) < 60:  # If total time is less than an hour
+        minutes = int(value // 60)
+        seconds = round((value / 60 - minutes) * 60, 2)
+        formatted_value = f"{minutes}:{seconds:05.2f}"
+    else:  # If total time is one hour or more
+        hours = int(value // 3600)
+        minutes = int((value % 3600) // 60)
+        seconds = round(value % 60, 2)
+        formatted_value = f"{hours}:{minutes:02}:{seconds:05.2f}"
+    
+    pace = ""
+    return formatted_value, pace
 
 def replace_activity_name_by_typeId(typeId):
     typeId_name_map = {
@@ -45,9 +89,6 @@ def replace_activity_name_by_typeId(typeId):
     return typeId_name_map.get(typeId, "Unnamed Activity")
 
 def get_existing_record(client, database_id, activity_name):
-    """
-    Check if a record with the given activity name exists in the Notion database.
-    """
     query = client.databases.query(
         database_id=database_id,
         filter={
@@ -59,18 +100,17 @@ def get_existing_record(client, database_id, activity_name):
     )
     return query['results'][0] if query['results'] else None
 
-def update_record(client, page_id, activity_date, pr_value, is_pr=True):
-    """
-    Update an existing record in the Notion database.
-    """
+def update_record(client, page_id, activity_date, value, pace, is_pr=True):
     properties = {
         "Date": {"date": {"start": activity_date}},
         "PR": {"checkbox": is_pr}
     }
     
-    # Only update the Value if pr_value is not None and is a non-empty string
-    if pr_value and isinstance(pr_value, str):
-        properties["Value"] = {"rich_text": [{"text": {"content": pr_value}}]}
+    if value:
+        properties["Value"] = {"rich_text": [{"text": {"content": value}}]}
+    
+    if pace:
+        properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
     
     try:
         client.pages.update(
@@ -80,10 +120,7 @@ def update_record(client, page_id, activity_date, pr_value, is_pr=True):
     except Exception as e:
         print(f"Error updating record: {e}")
 
-def write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, pr_value):
-    """
-    Write a new record to the Notion database.
-    """
+def write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace):
     properties = {
         "Date": {"date": {"start": activity_date}},
         "Activity Type": {"select": {"name": activity_type}},
@@ -92,9 +129,11 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
         "PR": {"checkbox": True}
     }
     
-    # Only add the Value if pr_value is not None and is a non-empty string
-    if pr_value and isinstance(pr_value, str):
-        properties["Value"] = {"rich_text": [{"text": {"content": pr_value}}]}
+    if value:
+        properties["Value"] = {"rich_text": [{"text": {"content": value}}]}
+    
+    if pace:
+        properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
     
     try:
         client.pages.create(
@@ -123,25 +162,25 @@ def main():
         activity_type = format_activity_type(record.get('activityType'))
         activity_name = replace_activity_name_by_typeId(record.get('typeId'))
         typeId = record.get('typeId', 0)
-        pr_value = format_garmin_value(record.get('value', 0), activity_type, typeId)
+        value, pace = format_garmin_value(record.get('value', 0), activity_type, typeId)
 
         existing_record = get_existing_record(client, database_id, activity_name)
 
         if existing_record:
             existing_date = existing_record['properties']['Date']['date']['start']
             if activity_date > existing_date:
-                # New PR: Update the existing record and mark it as not PR
-                update_record(client, existing_record['id'], existing_date, None, False)
+                # Archive old record
+                update_record(client, existing_record['id'], existing_date, None, None, False)
                 print(f"Archived old record: {activity_type} - {activity_name}")
                 
-                # Create a new record for the new PR
-                write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, pr_value)
+                # Create new PR record
+                write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
                 print(f"Created new PR record: {activity_type} - {activity_name}")
             else:
                 print(f"No update needed: {activity_type} - {activity_name}")
         else:
-            # New record: Write to Notion
-            write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, pr_value)
+            # New record
+            write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
             print(f"Successfully written new record: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
