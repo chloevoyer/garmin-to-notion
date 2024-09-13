@@ -19,13 +19,24 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_garmin_value(value, activity_type, typeId):
-    if typeId in [1, 2, 3, 4]:  # Distance-based records
+    if typeId in [1, 2, 4]:  # Distance-based records
         total_seconds = round(value)  # Round to the nearest second
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         formatted_value = f"{minutes}:{seconds:02d}"
         pace = formatted_value  # For these types, the value is the pace
         return formatted_value, pace
+
+    if typeId == 3:  # 5K
+        total_seconds = round(value)  # Round to the nearest second
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        formatted_value = f"{minutes}:{seconds:02d}"
+        total_pseconds = total_seconds // 5  # Divide by 5km
+        pminutes = total_pseconds // 60
+        pseconds = total_pseconds % 60
+        formatted_pace = f"{pminutes}:{pseconds:02d}"
+        return formatted_value, formatted_pace
 
     if typeId in [7, 8]:  # Longest Run, Longest Ride
         value_km = value / 1000
