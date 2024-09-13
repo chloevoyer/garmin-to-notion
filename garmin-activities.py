@@ -33,11 +33,24 @@ def format_entertainment(activity_name):
 def format_aerobicmessage(aerobicTrainingEffectMessage):
     return (aerobicTrainingEffectMessage
             .replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
-            .replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
-            .replace('IMPACTING_TEMPO_22', 'Impacting')
+            .replace('NO_AEROBIC_BENEFIT_18', 'No Benefit')
             .replace('RECOVERY_5', 'Recovery')
+            .replace('MINOR_AEROBIC_BENEFIT_0', 'Some Benefit')
+            .replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
             .replace('MAINTAINING_TEMPO_21', 'Maintaining')               
-            .replace('IMPROVING_VO2_MAX_15', 'Impacting'))
+            .replace('MAINTAINING_AEROBIC_BASE_7', 'Impacting')
+            .replace('IMPROVING_VO2_MAX_15', 'Impacting')
+            .replace('IMPROVING_VO2_MAX_15', 'Impacting')
+            .replace('IMPROVING_AEROBIC_BASE_8', 'Impacting')
+            .replace('IMPROVING_LACTATE_THRESHOLD_12', 'Impacting')
+            .replace('IMPROVING_AEROBIC_FITNESS_2', 'Impacting')
+            .replace('IMPACTING_TEMPO_22', 'Impacting')
+            .replace('HIGHLY_IMPROVING_AEROBIC_FITNESS_3', 'Highly Impacting')
+            .replace('HIGHLY_IMPACTING_TEMPO_23', 'Highly Impacting')
+            .replace('HIGHLY_IMPROVING_VO2_MAX_16', 'Highly Impacting')
+            .replace('HIGHLY_IMPROVING_LACTATE_THRESHOLD_13', 'Highly Impacting')
+            .replace('OVERREACHING_17', 'Overreaching')
+           )
 
 def format_anaerobicmessage(anaerobicTrainingEffectMessage):
     return (anaerobicTrainingEffectMessage
@@ -45,7 +58,22 @@ def format_anaerobicmessage(anaerobicTrainingEffectMessage):
             .replace('MAINTAINING_ANAEROBIC_FITNESS_1', 'Maintaining')
             .replace('MAINTAINING_ANAEROBIC_BASE_1', 'Impacting')
             .replace('RECOVERY_5', 'Recovery')
-            .replace('MAINTAINING_TEMPO_21', 'Maintaining'))
+            .replace('MAINTAINING_TEMPO_21', 'Maintaining')
+            .replace('RECOVERY_5', 'Recovery')
+            .replace('MINOR_ANAEROBIC_BENEFIT_0', 'Some Benefit')
+            .replace('MINOR_ANAEROBIC_BENEFIT_15', 'Some Benefit')
+            .replace('MAINTAINING_ANAEROBIC_POWER_7', 'Maintaining')               
+            .replace('MAINTAINING_ECONOMY_AND_ANAEROBIC_BASE_10', 'Impacting')
+            .replace('IMPROVING_VO2_MAX_15', 'Impacting')
+            .replace('IMPROVING_ANAEROBIC_BASE_2', 'Impacting')
+            .replace('IMPROVING_LACTATE_THRESHOLD_12', 'Impacting')
+            .replace('IMPROVING_ANAEROBIC_CAPACITY_AND_POWER_8', 'Impacting')
+            .replace('IMPACTING_TEMPO_22', 'Impacting')
+            .replace('HIGHLY_IMPROVING_ANAEROBIC_CAPACITY_AND_POWER_3', 'Highly Impacting')
+            .replace('HIGHLY_IMPROVING_VO2_MAX_16', 'Highly Impacting')
+            .replace('HIGHLY_IMPROVING_LACTATE_THRESHOLD_13', 'Highly Impacting')
+            .replace('OVERREACHING_17', 'Overreaching')
+           )
 
 def format_training_effect(trainingEffect_label):
     return trainingEffect_label.replace('_', ' ').title()
@@ -76,8 +104,7 @@ def activity_exists(client, database_id, activity_date, activity_type, activity_
     return len(query['results']) > 0
 
 def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace,
-              aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
-              relation_id, pr_status):
+              aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label, pr_status):
     """
     Writes a row to the Notion database with the specified activity details.
     """
@@ -96,7 +123,6 @@ def write_row(client, database_id, activity_date, activity_type, activity_name, 
             "Aerobic Effect": {"select": {"name": aerobicTrainingEffectMessage}},
             "Anaerobic Effect": {"select": {"name": anaerobicTrainingEffectMessage}},
             "Training Effect": {"select": {"name": trainingEffect_label}},
-            "Month": {"relation": [{"id": relation_id}]},
             "PR": {"checkbox": pr_status}
         }
     )
@@ -114,17 +140,15 @@ def main():
     garmin.login()
     client = Client(auth=notion_token)
     
-    # This is only used to initialize all Garmin activities in my database. I only sync today's event regularly.
-        # Fetch activities (0, 1000) is a range; you may adjust it if needed.
-    activities = garmin.get_activities(0, 1000)
-    # print(activities)
+    # Run once to initialize all Garmin activities in database, then comment out. 
+    # activities = garmin.get_activities(0, 1000) # Fetch activities (0, 1000) is a range; you may adjust it if needed.
 
     # Get today's activities
-    # todays_activities = get_todays_activities(garmin)
+    todays_activities = get_todays_activities(garmin)
     # print("Today's Activities:", todays_activities)
 
     # Process only today's activities
-    for activity in activities:
+    for activity in todays_activities: # replace with 'activities' if importing data into Notion database for the first time
         activity_date = activity.get('startTimeGMT')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
@@ -149,8 +173,7 @@ def main():
         # Write to Notion
         try:
             write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
-                      aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
-                      relation_id, pr_status)
+                      aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label, pr_status)
             print(f"Successfully written: {activity_type} - {activity_name}")
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
