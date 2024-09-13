@@ -125,7 +125,7 @@ def get_record_by_date_and_name(client, database_id, activity_date, activity_nam
     )
     return query['results'][0] if query['results'] else None
 
-def update_record(client, page_id, activity_date, value, pace, is_pr=True, seconds):
+def update_record(client, page_id, activity_date, value, pace, seconds, is_pr=True):
     properties = {
         "Date": {"date": {"start": activity_date}},
         "PR": {"checkbox": is_pr},
@@ -152,7 +152,8 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
         "Activity Type": {"select": {"name": activity_type}},
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
         "typeId": {"number": typeId},
-        "PR": {"checkbox": True}
+        "PR": {"checkbox": True},
+        "Seconds": {"number": seconds}
     }
     
     if value:
