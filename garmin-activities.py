@@ -117,7 +117,7 @@ def main():
     # Process only today's activities
     for activity in todays_activities:
         activity_date = activity.get('startTimeGMT')
-        sportTypeId = format_parentTypeId(activity.get('sportTypeId', {}).get('typeKey', 'Unknown'))
+        sportTypeId = format_sportTypeId(activity.get('sportTypeId', {}).get('typeKey', 'Unknown'))
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
         distance_km = round(activity.get('distance', 0) / 1000, 2)
