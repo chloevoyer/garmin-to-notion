@@ -115,7 +115,7 @@ def main():
     client = Client(auth=notion_token)
     
     # This is only used to initialize all Garmin activities in my database. I only sync today's event regularly.
-        Fetch activities (0, 1000) is a range; you may adjust it if needed.
+        # Fetch activities (0, 1000) is a range; you may adjust it if needed.
         activities = garmin.get_activities(0, 1000)
         print(activities)
 
