@@ -31,9 +31,11 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_parentTypeId(parentTypeId):
-    return (parentTypeId
-            .replace(1, 'Running')
-            .replace(2, 'Cycling'))
+    mapping = {
+        1: 'Running',
+        2: 'Cycling'
+    }
+    return mapping.get(parentTypeId, parentTypeId)
 
 def format_aerobicmessage(aerobicTrainingEffectMessage):
     return (aerobicTrainingEffectMessage
