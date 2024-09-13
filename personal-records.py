@@ -19,11 +19,11 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_garmin_value(value, activity_type, typeId):
-    # This function now returns a tuple (value, pace)
     if typeId in [1, 2, 3, 4]:  # Distance-based records
-        minutes = int(value // 60)
-        seconds = round((value / 60 - minutes) * 60, 2)
-        formatted_value = f"{minutes}:{seconds:05.2f}"
+        total_seconds = round(value)  # Round to the nearest second
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        formatted_value = f"{minutes}:{seconds:02d}"
         pace = formatted_value  # For these types, the value is the pace
         return formatted_value, pace
 
