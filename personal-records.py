@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from garminconnect import Garmin
 from notion_client import Client
+import os
 
 def format_activity_type(activity_type):
     """
