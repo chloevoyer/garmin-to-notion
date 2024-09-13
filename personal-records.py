@@ -25,16 +25,16 @@ def format_garmin_value(value, activity_type, typeId):
         seconds = total_seconds % 60
         formatted_value = f"{minutes}:{seconds:02d}"
         pace = formatted_value  # For these types, the value is the pace
-        return formatted_value, formatted_value
+        return formatted_value, pace
 
     if typeId  == 2:  # 1mile
         total_seconds = round(value)  # Round to the nearest second
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         formatted_value = f"{minutes}:{seconds:02d}"
-        total_pseconds = total_seconds * 1.60934
-        pminutes = total_pseconds // 60
-        pseconds = total_pseconds % 60
+        total_pseconds = total_seconds * 1.60934  # Convert to kilometers
+        pminutes = int(total_pseconds // 60)      # Convert to integer
+        pseconds = int(total_pseconds % 60)       # Convert to integer
         formatted_pace = f"{pminutes}:{pseconds:02d}"
         return formatted_value, formatted_pace
 
