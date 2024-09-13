@@ -59,6 +59,22 @@ def format_pace(average_speed):
     else:
         return ""
 
+def activity_exists(client, database_id, activity_date, activity_type, activity_name):
+    """
+    Check if an activity already exists in the Notion database.
+    """
+    query = client.databases.query(
+        database_id=database_id,
+        filter={
+            "and": [
+                {"property": "Date", "date": {"equals": activity_date.split('T')[0]}},
+                {"property": "Activity Type", "select": {"equals": activity_type}},
+                {"property": "Activity Name", "title": {"equals": activity_name}}
+            ]
+        }
+    )
+    return len(query['results']) > 0
+
 def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace,
               aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
               relation_id, pr_status):
@@ -98,11 +114,6 @@ def main():
     garmin.login()
     client = Client(auth=notion_token)
 
-    # This is only used to initialize all Garmin activities in my database. I only sync today's event regularly.
-        # Fetch activities (0, 100) is a range; you may adjust it if needed.
-        # activities = garmin.get_activities(0, 5)
-        # print(activities)
-
     # Get today's activities
     todays_activities = get_todays_activities(garmin)
     print("Today's Activities:", todays_activities)
@@ -112,6 +123,12 @@ def main():
         activity_date = activity.get('startTimeGMT')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
+        
+        # Check if activity already exists in Notion
+        if activity_exists(client, database_id, activity_date, activity_type, activity_name):
+            print(f"Activity already exists: {activity_type} - {activity_name}")
+            continue
+        
         distance_km = round(activity.get('distance', 0) / 1000, 2)
         duration_minutes = round(activity.get('duration', 0) / 60, 2)
         calories = activity.get('calories', 0)
@@ -133,10 +150,5 @@ def main():
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
 
-
 if __name__ == '__main__':
     main()
-
-
-
-
