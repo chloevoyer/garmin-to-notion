@@ -32,7 +32,7 @@ def format_garmin_value(value, activity_type, typeId):
         minutes = total_seconds // 60
         seconds = total_seconds % 60
         formatted_value = f"{minutes}:{seconds:02d}"
-        total_pseconds = total_seconds * 1.60934  # Convert to kilometers
+        total_pseconds = total_seconds / 1.60934  # Divide by 1.60934 to get pace per km
         pminutes = int(total_pseconds // 60)      # Convert to integer
         pseconds = int(total_pseconds % 60)       # Convert to integer
         formatted_pace = f"{pminutes}:{pseconds:02d}"
