@@ -38,10 +38,14 @@ def format_aerobicmessage(aerobicTrainingEffectMessage):
     return aerobicTrainingEffectMessage.replace('NO_AEROBIC_BENEFIT_0', 'No Benefit')
     return aerobicTrainingEffectMessage.replace('MAINTAINING_AEROBIC_FITNESS_1', 'Maintaining')
     return aerobicTrainingEffectMessage.replace('IMPACTING_TEMPO_22', 'Impacting')
-    
+    return aerobicTrainingEffectMessage.replace('RECOVERY_5', 'Recovery')    
+    return aerobicTrainingEffectMessage.replace('MAINTAINING_TEMPO_21', 'Maintaining')
+    return aerobicTrainingEffectMessage.replace('IMPACTING_TEMPO_22', 'Impacting')
+
 def format_anaerobicmessage(anaerobicTrainingEffectMessage):
     return anaerobicTrainingEffectMessage.replace('NO_ANAEROBIC_BENEFIT_0', 'No Benefit')
     return anaerobicTrainingEffectMessage.replace('MAINTAINING_ANAEROBIC_FITNESS_1', 'Maintaining')
+    return anaerobicTrainingEffectMessage.replace('MAINTAINING_ANAEROBIC_BASE_1', 'Maintaining')
 
 def format_training_effect(trainingEffect_label):
     return trainingEffect_label.replace('_', ' ').title()
