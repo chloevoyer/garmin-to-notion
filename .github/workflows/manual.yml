@@ -30,4 +30,6 @@ jobs:
           NOTION_RL_ID: ${{ secrets.NOTION_RL_ID }}
         run: |
           python garmin-activities.py
+          python personal-records.py
+
         
