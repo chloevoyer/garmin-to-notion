@@ -52,8 +52,8 @@ def format_pace(average_speed):
         return ""
 
 def write_row(client, database_id, activity_date, parentTypeId, activity_type, activity_name, distance, duration, calories, avg_pace,
-              aerobic, anaerobic, anaerobicTrainingEffectMessage, aerobicTrainingEffectMessage, trainingEffect_label,
-              pr_status, relation_id):
+              aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
+              relation_id, pr_status):
     """
     Writes a row to the Notion database with the specified activity details.
     """
@@ -120,9 +120,9 @@ def main():
 
         # Write to Notion
         try:
-            write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
+            write_row(client, database_id, activity_date, parentTypeId, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
                       aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label,
-                      pr_status, relation_id)
+                      relation_id, pr_status)
             print(f"Successfully written: {activity_type} - {activity_name}")
         except Exception as e:
             print(f"Failed to write to Notion: {e}")
