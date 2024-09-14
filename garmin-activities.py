@@ -106,9 +106,9 @@ def update_activity(client, existing_activity, new_activity):
             "Calories": {"number": new_activity.get('calories', 0)},
             "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
             "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
-            "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 1))},
+            "Aerobic": {"number": new_activity.get('aerobicTrainingEffect')},
             "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-            "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 1))},
+            "Anaerobic": {"number": new_activity.get('anaerobicTrainingEffect')},
             "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
             "PR": {"checkbox": new_activity.get('pr', False)}
         }
@@ -134,9 +134,9 @@ def create_activity(client, database_id, activity):
         "Calories": {"number": activity.get('calories', 0)},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
         "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
-        "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 1))},
+        "Aerobic": {"number": activity.get('aerobicTrainingEffect')},
         "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-        "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 1))},
+        "Anaerobic": {"number": activity.get('anaerobicTrainingEffect')},
         "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
         "PR": {"checkbox": activity.get('pr', False)}
     }
@@ -166,9 +166,9 @@ def update_activity(client, existing_activity, new_activity):
         "Calories": {"number": new_activity.get('calories', 0)},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
         "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
-        "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 1))},
+        "Aerobic": {"number": new_activity.get('aerobicTrainingEffect')},
         "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-        "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 1))},
+        "Anaerobic": {"number": new_activity.get('anaerobicTrainingEffect')},
         "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
         "PR": {"checkbox": new_activity.get('pr', False)}
     }
