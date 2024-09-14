@@ -3,7 +3,7 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
-def get_icon_for_activity(activity_name):
+def get_icon_for_record(activity_name):
     icon_map = {
         "1K": "🥇",
         "1mi": "🛣️",
@@ -176,7 +176,7 @@ def update_record(client, page_id, activity_date, value, pace, activity_type, is
     if pace:
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
 
-    icon = get_icon_for_activity(activity_type)
+    icon = get_icon_for_record(activity_name)
 
     try:
         client.pages.update(
@@ -202,7 +202,7 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
     if pace:
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
     
-    icon = get_icon_for_activity(activity_type)
+    icon = get_icon_for_record(activity_name)
 
     try:
         client.pages.create(
