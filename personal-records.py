@@ -3,7 +3,7 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
-def get_icon_for_activity(activity_type):
+def get_icon_for_activity(activity_name):
     icon_map = {
         "1K": "🥇",
         "1mi": "🛣️",
@@ -19,7 +19,7 @@ def get_icon_for_activity(activity_type):
         "Longest Goal Streak": "✔️",
         "Other": "🏅"
     }
-    return icon_map.get(activity_type, "🏅")  # Default to "Other" icon if not found
+    return icon_map.get(activity_name, "🏅")  # Default to "Other" icon if not found
 
 def format_activity_type(activity_type):
     if activity_type is None:
@@ -30,11 +30,6 @@ def format_activity_name(activity_name):
     if not activity_name or activity_name is None:
         return "Unnamed Activity"
     return activity_name
-
-def format_entertainment(activity_name):
-    if activity_name is None:
-        return ""
-    return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_garmin_value(value, activity_type, typeId):
     if typeId  == 1:  # 1K
