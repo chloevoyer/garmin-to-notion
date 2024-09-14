@@ -8,16 +8,16 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
-    "Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fc83976b4-fc28-4762-a3a1-9a6f5aee69a4%2FCycling.png?table=block&id=916f6c01-91be-45c3-aac0-12bc402dc027&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&width=250&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2",
-    "Treadmill Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fe862ecc4-314c-4e63-a2b8-af2b4f3e96a7%2FTreadmill.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
-    "Cycling": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F98271e2c-055b-4eab-b449-df056eddf357%2FCycling.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
+    "Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fc83976b4-fc28-4762-a3a1-9a6f5aee69a4%2FCycling.png",
+    "Treadmill Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fe862ecc4-314c-4e63-a2b8-af2b4f3e96a7%2FTreadmill.svg",
+    "Cycling": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F98271e2c-055b-4eab-b449-df056eddf357%2FCycling.svg",
     "Indoor Cycling": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fc83976b4-fc28-4762-a3a1-9a6f5aee69a4%2FCycling.png",
-    "Swimming": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F23364b02-cacb-40cf-98b3-0f3254daae95%2FSwimming.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
-    "Strength Training": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Faba98524-d444-44dc-a662-8e251645cdc8%2FSit_Ups.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
-    "Walking": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbb62a42f-bb7f-4add-8a1d-86804ed8350c%2FWalking.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
-    "Yoga": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F15ed81b6-5b02-4d87-9ec0-a448b49f1a90%2FYoga.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
-    "Hiking": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbef1a0d4-1a06-4859-8521-1fe971bcf11e%2FTrekking.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
-    "Rowing": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbae973e7-30a2-45ed-ae0c-a153c9cc6f31%2FRow_Boat.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
+    "Swimming": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F23364b02-cacb-40cf-98b3-0f3254daae95%2FSwimming.svg",
+    "Strength Training": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Faba98524-d444-44dc-a662-8e251645cdc8%2FSit_Ups.svg",
+    "Walking": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbb62a42f-bb7f-4add-8a1d-86804ed8350c%2FWalking.svg",
+    "Yoga": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F15ed81b6-5b02-4d87-9ec0-a448b49f1a90%2FYoga.svg",
+    "Hiking": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbef1a0d4-1a06-4859-8521-1fe971bcf11e%2FTrekking.svg",
+    "Rowing": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbae973e7-30a2-45ed-ae0c-a153c9cc6f31%2FRow_Boat.svg",
     # Add more mappings as needed
 }
 
@@ -210,8 +210,6 @@ def main():
             if activity_needs_update(existing_activity, activity):
                 update_activity(client, existing_activity, activity)
                 print(f"Updated: {activity_type} - {activity_name}")
-            else:
-                print(f"No update needed: {activity_type} - {activity_name}")
         else:
             create_activity(client, database_id, activity)
             print(f"Created: {activity_type} - {activity_name}")
