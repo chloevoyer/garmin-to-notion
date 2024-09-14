@@ -3,6 +3,22 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
+# Define a mapping of activity types to emojis
+ACTIVITY_ICONS = {
+    "1K": "🏃",
+    "1mi": "🏃",
+    "5K": "🏃",
+    "10K": "🏃",
+    "Longest Run": "🚶",
+    "Longest Ride": "🚴",
+    "Total Ascent": "🚴",
+    "Max Avg Power (20 min)": "🚴",
+    "Most Steps in a Day": "🚶",
+    "Most Steps in a Week": "🚶",
+    "Most Steps in a Month": "🚶",
+    "Longest Goal Streak": "🚶"
+}
+
 def format_activity_type(activity_type):
     if activity_type is None:
         return "Walking"
@@ -126,19 +142,6 @@ def replace_activity_name_by_typeId(typeId):
         15: "Longest Goal Streak"
     }
     return typeId_name_map.get(typeId, "Unnamed Activity")
-
-def get_existing_record(client, database_id, activity_name):
-    query = client.databases.query(
-        database_id=database_id,
-        filter={
-            "and": [
-                {"property": "Record", "title": {"equals": activity_name}},
-                {"property": "PR", "checkbox": {"equals": True}}
-            ]
-        }
-    )
-    return query['results'][0] if query['results'] else None
-
 
 def get_existing_record(client, database_id, activity_name):
     query = client.databases.query(
