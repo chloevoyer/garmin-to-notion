@@ -16,7 +16,8 @@ def get_icon_for_activity(activity_type):
         "Most Steps in a Day": "👣",
         "Most Steps in a Week": "🚶",
         "Most Steps in a Month": "📅",
-        "Longest Goal Streak": "✔️"
+        "Longest Goal Streak": "✔️",
+        "Other": "🏅"
     }
     return icon_map.get(activity_type, "🏅")  # Default to "Other" icon if not found
 
