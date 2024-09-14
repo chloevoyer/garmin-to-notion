@@ -7,6 +7,20 @@ import os
 # Your local time zone, replace with the appropriate one if needed
 local_tz = pytz.timezone('America/Toronto')
 
+ACTIVITY_ICONS = {
+    "Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000"
+    ,"Treadmill Running": "https://img.icons8.com/?size=100&id=9794&format=png&color=000000"
+    ,"Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000"
+    ,"Indoor Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000"
+    ,"Swimming": "https://img.icons8.com/?size=100&id=9777&format=png&color=000000"
+    ,"Strength Training": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000"
+    ,"Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000"
+    ,"Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000"
+    ,"Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000"
+    ,"Rowing": "https://img.icons8.com/?size=100&id=24889&format=png&color=000000"
+    # Add more mappings as needed
+}
+
 def get_all_activities(garmin, limit=1000):
     return garmin.get_activities(0, limit)
 
@@ -107,24 +121,66 @@ def create_activity(client, database_id, activity):
     activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
     activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
     
-    client.pages.create(
-        parent={"database_id": database_id},
-        properties={
-            "Date": {"date": {"start": activity_date}},
-            "Activity Type": {"select": {"name": activity_type}},
-            "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-            "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
-            "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
-            "Calories": {"number": activity.get('calories', 0)},
-            "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
-            "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
-            "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 1))},
-            "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-            "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 1))},
-            "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
-            "PR": {"checkbox": activity.get('pr', False)}
-        }
-    )
+    # Get icon for the activity type
+    icon_url = ACTIVITY_ICONS.get(activity_type)
+    
+    properties = {
+        "Date": {"date": {"start": activity_date}},
+        "Activity Type": {"select": {"name": activity_type}},
+        "Activity Name": {"title": [{"text": {"content": activity_name}}]},
+        "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
+        "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
+        "Calories": {"number": activity.get('calories', 0)},
+        "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
+        "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
+        "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 1))},
+        "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
+        "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 1))},
+        "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
+        "PR": {"checkbox": activity.get('pr', False)}
+    }
+    
+    page = {
+        "parent": {"database_id": database_id},
+        "properties": properties,
+    }
+    
+    if icon_url:
+        page["icon"] = {"type": "external", "external": {"url": icon_url}}
+    
+    client.pages.create(**page)
+
+def update_activity(client, existing_activity, new_activity):
+    """
+    Update an existing activity in the Notion database with new data.
+    """
+    activity_type = format_activity_type(new_activity.get('activityType', {}).get('typeKey', 'Unknown'))
+    
+    # Get icon for the activity type
+    icon_url = ACTIVITY_ICONS.get(activity_type)
+    
+    properties = {
+        "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
+        "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
+        "Calories": {"number": new_activity.get('calories', 0)},
+        "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
+        "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
+        "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 1))},
+        "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
+        "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 1))},
+        "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
+        "PR": {"checkbox": new_activity.get('pr', False)}
+    }
+    
+    update = {
+        "page_id": existing_activity['id'],
+        "properties": properties,
+    }
+    
+    if icon_url:
+        update["icon"] = {"type": "external", "external": {"url": icon_url}}
+        
+    client.pages.update(**update)
 
 def main():
     # Initialize Garmin and Notion clients using environment variables
@@ -154,8 +210,6 @@ def main():
             if activity_needs_update(existing_activity, activity):
                 update_activity(client, existing_activity, activity)
                 print(f"Updated: {activity_type} - {activity_name}")
-            else:
-                print(f"No update needed: {activity_type} - {activity_name}")
         else:
             create_activity(client, database_id, activity)
             print(f"Created: {activity_type} - {activity_name}")
