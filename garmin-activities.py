@@ -37,7 +37,7 @@ def format_training_message(message):
         'MINOR_': 'Some Benefit',
         'RECOVERY_': 'Recovery',
         'MAINTAINING_': 'Maintaining',
-        'IMPROVING_': 'Improving',
+        'IMPROVING_': 'Impacting',
         'IMPACTING_': 'Impacting',
         'HIGHLY_': 'Highly Impacting',
         'OVERREACHING_': 'Overreaching'
@@ -87,9 +87,9 @@ def activity_needs_update(existing_activity, new_activity):
         existing_props['Calories']['number'] != new_activity.get('calories', 0) or
         existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
         existing_props['Training Effect']['select']['name'] != format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown')) or
-        existing_props['Aerobic']['number'] != round(new_activity.get('aerobicTrainingEffect', 1)) or
+        existing_props['Aerobic']['number'] != new_activity.get('aerobicTrainingEffect') or
         existing_props['Aerobic Effect']['select']['name'] != format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown')) or
-        existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 1)) or
+        existing_props['Anaerobic']['number'] != new_activity.get('anaerobicTrainingEffect') or
         existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
         existing_props['PR']['checkbox'] != new_activity.get('pr', False)
     )
@@ -210,10 +210,10 @@ def main():
         if existing_activity:
             if activity_needs_update(existing_activity, activity):
                 update_activity(client, existing_activity, activity)
-                print(f"Updated: {activity_type} - {activity_name}")
+                # print(f"Updated: {activity_type} - {activity_name}")
         else:
             create_activity(client, database_id, activity)
-            print(f"Created: {activity_type} - {activity_name}")
+            # print(f"Created: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
     main()
