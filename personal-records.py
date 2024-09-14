@@ -5,18 +5,18 @@ import os
 
 def get_icon_for_activity(activity_type):
     icon_map = {
-        "1K": "🏃",
-        "1mi": "🏃",
+        "1K": "🥇",
+        "1mi": "🛣️",
         "5K": "🏃",
         "10K": "🏃",
-        "Longest Run": "🚶",
+        "Longest Run": "🏅",
         "Longest Ride": "🚴",
-        "Total Ascent": "🚴",
-        "Max Avg Power (20 min)": "🚴",
-        "Most Steps in a Day": "🚶",
+        "Total Ascent": "🚵",
+        "Max Avg Power (20 min)": "🔋",
+        "Most Steps in a Day": "👣",
         "Most Steps in a Week": "🚶",
-        "Most Steps in a Month": "🚶",
-        "Longest Goal Streak": "🏅"
+        "Most Steps in a Month": "📅",
+        "Longest Goal Streak": "✔️"
     }
     return icon_map.get(activity_type, "🏅")  # Default to "Other" icon if not found
 
