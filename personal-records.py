@@ -3,6 +3,24 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
+def get_icon_for_record(activity_name):
+    icon_map = {
+        "1K": "🥇",
+        "1mi": "🛣️",
+        "5K": "🏃",
+        "10K": "🏃",
+        "Longest Run": "🏅",
+        "Longest Ride": "🚴",
+        "Total Ascent": "🚵",
+        "Max Avg Power (20 min)": "🔋",
+        "Most Steps in a Day": "👣",
+        "Most Steps in a Week": "🚶",
+        "Most Steps in a Month": "📅",
+        "Longest Goal Streak": "✔️",
+        "Other": "🏅"
+    }
+    return icon_map.get(activity_name, "🏅")  # Default to "Other" icon if not found
+
 def format_activity_type(activity_type):
     if activity_type is None:
         return "Walking"
@@ -12,11 +30,6 @@ def format_activity_name(activity_name):
     if not activity_name or activity_name is None:
         return "Unnamed Activity"
     return activity_name
-
-def format_entertainment(activity_name):
-    if activity_name is None:
-        return ""
-    return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_garmin_value(value, activity_type, typeId):
     if typeId  == 1:  # 1K
@@ -139,19 +152,6 @@ def get_existing_record(client, database_id, activity_name):
     )
     return query['results'][0] if query['results'] else None
 
-
-def get_existing_record(client, database_id, activity_name):
-    query = client.databases.query(
-        database_id=database_id,
-        filter={
-            "and": [
-                {"property": "Record", "title": {"equals": activity_name}},
-                {"property": "PR", "checkbox": {"equals": True}}
-            ]
-        }
-    )
-    return query['results'][0] if query['results'] else None
-
 def get_record_by_date_and_name(client, database_id, activity_date, activity_name):
     query = client.databases.query(
         database_id=database_id,
@@ -164,7 +164,7 @@ def get_record_by_date_and_name(client, database_id, activity_date, activity_nam
     )
     return query['results'][0] if query['results'] else None
 
-def update_record(client, page_id, activity_date, value, pace, is_pr=True):
+def update_record(client, page_id, activity_date, value, pace, activity_name, is_pr=True):
     properties = {
         "Date": {"date": {"start": activity_date}},
         "PR": {"checkbox": is_pr}
@@ -175,11 +175,14 @@ def update_record(client, page_id, activity_date, value, pace, is_pr=True):
     
     if pace:
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
-    
+
+    icon = get_icon_for_record(activity_name)
+
     try:
         client.pages.update(
             page_id=page_id,
-            properties=properties
+            properties=properties,
+            icon={"emoji": icon}
         )
     except Exception as e:
         print(f"Error updating record: {e}")
@@ -199,10 +202,14 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
     if pace:
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
     
+    icon = get_icon_for_record(activity_name)
+
     try:
         client.pages.create(
             parent={"database_id": database_id},
-            properties=properties
+            properties=properties,
+            icon={"emoji": icon}
+
         )
     except Exception as e:
         print(f"Error writing new record: {e}")
@@ -232,23 +239,19 @@ def main():
         existing_date_record = get_record_by_date_and_name(client, database_id, activity_date, activity_name)
 
         if existing_date_record:
-            # Update the existing record for this date and activity
-            update_record(client, existing_date_record['id'], activity_date, value, pace, True)
+            update_record(client, existing_date_record['id'], activity_date, value, pace, activity_name, True)
             print(f"Updated existing record: {activity_type} - {activity_name}")
         elif existing_pr_record:
             existing_date = existing_pr_record['properties']['Date']['date']['start']
             if activity_date > existing_date:
-                # Archive old record
-                update_record(client, existing_pr_record['id'], existing_date, None, None, False)
+                update_record(client, existing_pr_record['id'], existing_date, None, None, activity_name, False)
                 print(f"Archived old record: {activity_type} - {activity_name}")
                 
-                # Create new PR record
                 write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
                 print(f"Created new PR record: {activity_type} - {activity_name}")
             else:
                 print(f"No update needed: {activity_type} - {activity_name}")
         else:
-            # New record
             write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
             print(f"Successfully written new record: {activity_type} - {activity_name}")
 
