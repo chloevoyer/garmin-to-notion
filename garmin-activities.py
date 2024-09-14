@@ -13,7 +13,7 @@ ACTIVITY_ICONS = {
     ,"Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000"
     ,"Indoor Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000"
     ,"Swimming": "https://img.icons8.com/?size=100&id=9777&format=png&color=000000"
-    ,"Strength Training": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000"
+    ,"Indoor Cardio": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000"
     ,"Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000"
     ,"Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000"
     ,"Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000"
