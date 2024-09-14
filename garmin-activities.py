@@ -8,16 +8,16 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
-    "Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fc83976b4-fc28-4762-a3a1-9a6f5aee69a4%2FCycling.png",
-    "Treadmill Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fe862ecc4-314c-4e63-a2b8-af2b4f3e96a7%2FTreadmill.svg",
+    "Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000",
+    "Treadmill Running": "https://img.icons8.com/?size=100&id=9794&format=png&color=000000",
     "Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
     "Indoor Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
-    "Swimming": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F23364b02-cacb-40cf-98b3-0f3254daae95%2FSwimming.svg",
-    "Strength Training": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Faba98524-d444-44dc-a662-8e251645cdc8%2FSit_Ups.svg",
-    "Walking": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbb62a42f-bb7f-4add-8a1d-86804ed8350c%2FWalking.svg",
-    "Yoga": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F15ed81b6-5b02-4d87-9ec0-a448b49f1a90%2FYoga.svg",
-    "Hiking": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbef1a0d4-1a06-4859-8521-1fe971bcf11e%2FTrekking.svg",
-    "Rowing": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fbae973e7-30a2-45ed-ae0c-a153c9cc6f31%2FRow_Boat.svg",
+    "Swimming": "https://img.icons8.com/?size=100&id=9777&format=png&color=000000",
+    "Strength Training": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000",
+    "Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000",
+    "Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000",
+    "Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000",
+    "Rowing": "https://img.icons8.com/?size=100&id=24889&format=png&color=000000",
     # Add more mappings as needed
 }
 
