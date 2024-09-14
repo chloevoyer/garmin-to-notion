@@ -122,7 +122,7 @@ def create_activity(client, database_id, activity):
     activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
     activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
     
-    # Get icon and cover for the activity type
+    # Get icon for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_type)
     
     properties = {
@@ -149,9 +149,6 @@ def create_activity(client, database_id, activity):
     if icon_url:
         page["icon"] = {"type": "external", "external": {"url": icon_url}}
     
-    if cover:
-        page["cover"] = {"type": "external", "external": {"url": cover}}
-    
     client.pages.create(**page)
 
 def update_activity(client, existing_activity, new_activity):
@@ -160,7 +157,7 @@ def update_activity(client, existing_activity, new_activity):
     """
     activity_type = format_activity_type(new_activity.get('activityType', {}).get('typeKey', 'Unknown'))
     
-    # Get icon and cover for the activity type
+    # Get icon for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_type)
     
     properties = {
