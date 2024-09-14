@@ -239,19 +239,21 @@ def main():
         existing_date_record = get_record_by_date_and_name(client, database_id, activity_date, activity_name)
 
         if existing_date_record:
-            update_record(client, existing_date_record['id'], activity_date, value, pace, activity_type, True)
-            # print(f"Updated existing record: {activity_type} - {activity_name}")
+            update_record(client, existing_date_record['id'], activity_date, value, pace, activity_name, True)
+            print(f"Updated existing record: {activity_type} - {activity_name}")
         elif existing_pr_record:
             existing_date = existing_pr_record['properties']['Date']['date']['start']
             if activity_date > existing_date:
-                update_record(client, existing_pr_record['id'], existing_date, None, None, activity_type, False)
-                # print(f"Archived old record: {activity_type} - {activity_name}")
+                update_record(client, existing_pr_record['id'], existing_date, None, None, activity_name, False)
+                print(f"Archived old record: {activity_type} - {activity_name}")
                 
                 write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
-                # print(f"Created new PR record: {activity_type} - {activity_name}")
+                print(f"Created new PR record: {activity_type} - {activity_name}")
+            else:
+                print(f"No update needed: {activity_type} - {activity_name}")
         else:
             write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
-            # print(f"Successfully written new record: {activity_type} - {activity_name}")
+            print(f"Successfully written new record: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
     main()
