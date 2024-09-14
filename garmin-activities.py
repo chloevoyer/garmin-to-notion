@@ -124,7 +124,6 @@ def create_activity(client, database_id, activity):
     
     # Get icon and cover for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_type)
-    cover = ACTIVITY_COVERS.get(activity_type)
     
     properties = {
         "Date": {"date": {"start": activity_date}},
@@ -163,7 +162,6 @@ def update_activity(client, existing_activity, new_activity):
     
     # Get icon and cover for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_type)
-    cover = ACTIVITY_COVERS.get(activity_type)
     
     properties = {
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
