@@ -8,7 +8,7 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
-    "Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F73a73bb9-bc6c-4d1a-9ba5-ba29d84632b8%2FExercise3.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
+    "Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fc83976b4-fc28-4762-a3a1-9a6f5aee69a4%2FCycling.png",
     "Treadmill Running": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2Fe862ecc4-314c-4e63-a2b8-af2b4f3e96a7%2FTreadmill.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
     "Cycling": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F98271e2c-055b-4eab-b449-df056eddf357%2FCycling.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
     "Indoor Cycling": "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F5f8cbff8-587c-40dc-b000-881bd747e0a2%2F98271e2c-055b-4eab-b449-df056eddf357%2FCycling.svg?table=block&id=10015ce7-0588-819c-9b8b-c1844eb6b31f&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2&mode=dark",
