@@ -3,21 +3,22 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
-# Define a mapping of activity types to emojis
-ACTIVITY_ICONS = {
-    "1K": "🏃",
-    "1mi": "🏃",
-    "5K": "🏃",
-    "10K": "🏃",
-    "Longest Run": "🚶",
-    "Longest Ride": "🚴",
-    "Total Ascent": "🚴",
-    "Max Avg Power (20 min)": "🚴",
-    "Most Steps in a Day": "🚶",
-    "Most Steps in a Week": "🚶",
-    "Most Steps in a Month": "🚶",
-    "Longest Goal Streak": "🚶"
-}
+def get_icon_for_activity(activity_type):
+    icon_map = {
+        "1K": "🏃",
+        "1mi": "🏃",
+        "5K": "🏃",
+        "10K": "🏃",
+        "Longest Run": "🚶",
+        "Longest Ride": "🚴",
+        "Total Ascent": "🚴",
+        "Max Avg Power (20 min)": "🚴",
+        "Most Steps in a Day": "🚶",
+        "Most Steps in a Week": "🚶",
+        "Most Steps in a Month": "🚶",
+        "Longest Goal Streak": "🏅"
+    }
+    return icon_map.get(activity_type, "🏅")  # Default to "Other" icon if not found
 
 def format_activity_type(activity_type):
     if activity_type is None:
@@ -178,11 +179,14 @@ def update_record(client, page_id, activity_date, value, pace, is_pr=True):
     
     if pace:
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
-    
+
+    icon = get_icon_for_activity(activity_type)
+
     try:
         client.pages.update(
             page_id=page_id,
-            properties=properties
+            properties=properties,
+            icon={"emoji": icon}
         )
     except Exception as e:
         print(f"Error updating record: {e}")
@@ -202,10 +206,14 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
     if pace:
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
     
+    icon = get_icon_for_activity(activity_type)
+
     try:
         client.pages.create(
             parent={"database_id": database_id},
-            properties=properties
+            properties=properties,
+            icon={"emoji": icon}
+
         )
     except Exception as e:
         print(f"Error writing new record: {e}")
