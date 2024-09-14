@@ -18,6 +18,7 @@ ACTIVITY_ICONS = {
     ,"Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000"
     ,"Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000"
     ,"Rowing": "https://img.icons8.com/?size=100&id=24889&format=png&color=000000"
+    ,"Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000"
     # Add more mappings as needed
 }
 
