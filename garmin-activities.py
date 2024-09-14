@@ -71,11 +71,11 @@ def activity_needs_update(existing_activity, new_activity):
         existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
         existing_props['Calories']['number'] != new_activity.get('calories', 0) or
         existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
-        existing_props['Aerobic']['number'] != round(new_activity.get('aerobicTrainingEffect', 1)) or
-        existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 1)) or
-        existing_props['Aerobic Effect']['select']['name'] != format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown')) or
-        existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
         existing_props['Training Effect']['select']['name'] != format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown')) or
+        existing_props['Aerobic']['number'] != round(new_activity.get('aerobicTrainingEffect', 1)) or
+        existing_props['Aerobic Effect']['select']['name'] != format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown')) or
+        existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 1)) or
+        existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
         existing_props['PR']['checkbox'] != new_activity.get('pr', False)
     )
 
@@ -90,11 +90,11 @@ def update_activity(client, existing_activity, new_activity):
             "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
             "Calories": {"number": new_activity.get('calories', 0)},
             "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
-            "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 1))},
-            "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 1))},
-            "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-            "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
             "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
+            "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 1))},
+            "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
+            "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 1))},
+            "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
             "PR": {"checkbox": new_activity.get('pr', False)}
         }
     )
@@ -117,11 +117,11 @@ def create_activity(client, database_id, activity):
             "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
             "Calories": {"number": activity.get('calories', 0)},
             "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
-            "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 1))},
-            "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 1))},
-            "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-            "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
             "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
+            "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 1))},
+            "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
+            "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 1))},
+            "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
             "PR": {"checkbox": activity.get('pr', False)}
         }
     )
