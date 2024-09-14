@@ -7,7 +7,7 @@ def get_icon_for_record(activity_name):
     icon_map = {
         "1K": "🥇",
         "1mi": "🛣️",
-        "5K": "🏃",
+        "5K": "👟",
         "10K": "🏃",
         "Longest Run": "🏅",
         "Longest Ride": "🚴",
