@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from garminconnect import Garmin
 from notion_client import Client
 import pytz
@@ -7,22 +7,8 @@ import os
 # Your local time zone, replace with the appropriate one if needed
 local_tz = pytz.timezone('America/Toronto')
 
-def get_todays_activities(garmin):
-    # Fetch recent activities, adjust the count if needed
-    activities = garmin.get_activities(0, 10)
-
-    # Get today's date in your local time zone
-    today = datetime.now(local_tz).date()
-
-    # Filter activities that occurred today in your local time zone
-    todays_activities = [
-        activity for activity in activities
-        if datetime.strptime(activity['startTimeGMT'], "%Y-%m-%d %H:%M:%S")
-        .replace(tzinfo=timezone.utc)
-        .astimezone(local_tz)
-        .date() == today
-    ]
-    return todays_activities
+def get_all_activities(garmin, limit=1000):
+    return garmin.get_activities(0, limit)
 
 def format_activity_type(activity_type):
     return activity_type.replace('_', ' ').title()
@@ -31,24 +17,20 @@ def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
 
 def format_training_message(message):
-    if message.startswith('NO_'):
-        return 'No Benefit'
-    elif 'MINOR_' in message:
-        return 'Some Benefit'
-    elif 'RECOVERY_' in message:
-        return 'Recovery'
-    elif 'MAINTAINING_' in message:
-        return 'Maintaining'
-    elif 'IMPROVING_' in message:
-        return 'Improving'
-    elif 'IMPACTING_' in message:
-        return 'Impacting'
-    elif 'HIGHLY_' in message:
-        return 'Highly Impacting'
-    elif 'OVERREACHING_' in message:
-        return 'Overreaching'
-    else:
-        return message  # Return the original message if no match is found
+    messages = {
+        'NO_': 'No Benefit',
+        'MINOR_': 'Some Benefit',
+        'RECOVERY_': 'Recovery',
+        'MAINTAINING_': 'Maintaining',
+        'IMPROVING_': 'Improving',
+        'IMPACTING_': 'Impacting',
+        'HIGHLY_': 'Highly Impacting',
+        'OVERREACHING_': 'Overreaching'
+    }
+    for key, value in messages.items():
+        if message.startswith(key):
+            return value
+    return message
 
 def format_training_effect(trainingEffect_label):
     return trainingEffect_label.replace('_', ' ').title()
@@ -64,7 +46,7 @@ def format_pace(average_speed):
 
 def activity_exists(client, database_id, activity_date, activity_type, activity_name):
     """
-    Check if an activity already exists in the Notion database.
+    Check if an activity already exists in the Notion database and return it if found.
     """
     query = client.databases.query(
         database_id=database_id,
@@ -76,29 +58,71 @@ def activity_exists(client, database_id, activity_date, activity_type, activity_
             ]
         }
     )
-    return len(query['results']) > 0
+    results = query['results']
+    return results[0] if results else None
 
-def write_row(client, database_id, activity_date, activity_type, activity_name, distance, duration, calories, avg_pace,
-              aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label, pr_status):
+def activity_needs_update(existing_activity, new_activity):
     """
-    Writes a row to the Notion database with the specified activity details.
+    Compare existing activity with new activity data to determine if an update is needed.
     """
+    existing_props = existing_activity['properties']
+    return (
+        existing_props['Distance (km)']['number'] != round(new_activity.get('distance', 0) / 1000, 2) or
+        existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
+        existing_props['Calories']['number'] != new_activity.get('calories', 0) or
+        existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
+        existing_props['Training Effect']['select']['name'] != format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown')) or
+        existing_props['Aerobic']['number'] != round(new_activity.get('aerobicTrainingEffect', 1)) or
+        existing_props['Aerobic Effect']['select']['name'] != format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown')) or
+        existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 1)) or
+        existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
+        existing_props['PR']['checkbox'] != new_activity.get('pr', False)
+    )
+
+def update_activity(client, existing_activity, new_activity):
+    """
+    Update an existing activity in the Notion database with new data.
+    """
+    client.pages.update(
+        page_id=existing_activity['id'],
+        properties={
+            "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
+            "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
+            "Calories": {"number": new_activity.get('calories', 0)},
+            "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
+            "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
+            "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 1))},
+            "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
+            "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 1))},
+            "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
+            "PR": {"checkbox": new_activity.get('pr', False)}
+        }
+    )
+
+def create_activity(client, database_id, activity):
+    """
+    Create a new activity in the Notion database.
+    """
+    activity_date = activity.get('startTimeGMT')
+    activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
+    activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
+    
     client.pages.create(
         parent={"database_id": database_id},
         properties={
             "Date": {"date": {"start": activity_date}},
             "Activity Type": {"select": {"name": activity_type}},
             "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-            "Distance (km)": {"number": distance},
-            "Duration (min)": {"number": duration},
-            "Calories": {"number": calories},
-            "Avg Pace": {"rich_text": [{"text": {"content": avg_pace}}]},
-            "Aerobic": {"number": aerobic},
-            "Anaerobic": {"number": anaerobic},
-            "Aerobic Effect": {"select": {"name": aerobicTrainingEffectMessage}},
-            "Anaerobic Effect": {"select": {"name": anaerobicTrainingEffectMessage}},
-            "Training Effect": {"select": {"name": trainingEffect_label}},
-            "PR": {"checkbox": pr_status}
+            "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
+            "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
+            "Calories": {"number": activity.get('calories', 0)},
+            "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
+            "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
+            "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 1))},
+            "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
+            "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 1))},
+            "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
+            "PR": {"checkbox": activity.get('pr', False)}
         }
     )
 
@@ -108,50 +132,33 @@ def main():
     garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
-    relation_id = os.getenv("NOTION_RL_ID")
 
     # Initialize Garmin client and login
     garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
     client = Client(auth=notion_token)
     
-    # Run once to initialize all Garmin activities in database, then comment out. 
-    # activities = garmin.get_activities(0, 1000) # Fetch activities (0, 1000) is a range; you may adjust it if needed.
+    # Get all activities
+    activities = get_all_activities(garmin)
 
-    # Get today's activities
-    todays_activities = get_todays_activities(garmin)
-    # print("Today's Activities:", todays_activities)
-
-    # Process only today's activities
-    for activity in todays_activities: # replace with 'activities' if importing data into Notion database for the first time
+    # Process all activities
+    for activity in activities:
         activity_date = activity.get('startTimeGMT')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
         
         # Check if activity already exists in Notion
-        if activity_exists(client, database_id, activity_date, activity_type, activity_name):
-            print(f"Activity already exists: {activity_type} - {activity_name}")
-            continue
+        existing_activity = activity_exists(client, database_id, activity_date, activity_type, activity_name)
         
-        distance_km = round(activity.get('distance', 0) / 1000, 2)
-        duration_minutes = round(activity.get('duration', 0) / 60, 2)
-        calories = activity.get('calories', 0)
-        average_speed = activity.get('averageSpeed', 0)
-        avg_pace = format_pace(average_speed)
-        aerobic = round(activity.get('aerobicTrainingEffect', 1))
-        anaerobic = round(activity.get('anaerobicTrainingEffect', 1))
-        aerobicTrainingEffectMessage = format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))
-        anaerobicTrainingEffectMessage = format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))
-        trainingEffect_label = format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))
-        pr_status = activity.get('pr', False)
-
-        # Write to Notion
-        try:
-            write_row(client, database_id, activity_date, activity_type, activity_name, distance_km, duration_minutes, calories, avg_pace,
-                      aerobic, anaerobic, aerobicTrainingEffectMessage, anaerobicTrainingEffectMessage, trainingEffect_label, pr_status)
-            print(f"Successfully written: {activity_type} - {activity_name}")
-        except Exception as e:
-            print(f"Failed to write to Notion: {e}")
+        if existing_activity:
+            if activity_needs_update(existing_activity, activity):
+                update_activity(client, existing_activity, activity)
+                print(f"Updated: {activity_type} - {activity_name}")
+            else:
+                print(f"No update needed: {activity_type} - {activity_name}")
+        else:
+            create_activity(client, database_id, activity)
+            print(f"Created: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
     main()
