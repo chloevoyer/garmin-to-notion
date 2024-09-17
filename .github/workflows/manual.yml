@@ -1,5 +1,4 @@
 name: Sync Garmin to Notion
-
 on:
   schedule:
     - cron: '*/15 * * * *'
@@ -10,16 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          pip install --upgrade setuptools wheel
+          pip install --use-feature=2020-resolver -r requirements.txt
 
       - name: Run script
         env:
@@ -31,5 +40,3 @@ jobs:
         run: |
           python garmin-activities.py
           python personal-records.py
-
-        
