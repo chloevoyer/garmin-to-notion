@@ -9,7 +9,7 @@ def get_icon_for_record(activity_name):
         "1mi": "⚡",
         "5K": "👟",
         "10K": "🏃",
-        "Longest Run": "🏅",
+        "Longest Run": "⭐",
         "Longest Ride": "🚴",
         "Total Ascent": "🚵",
         "Max Avg Power (20 min)": "🔋",
