@@ -6,10 +6,10 @@ import os
 def get_icon_for_record(activity_name):
     icon_map = {
         "1K": "🥇",
-        "1mi": "🛣️",
+        "1mi": "⚡",
         "5K": "👟",
-        "10K": "🏃",
-        "Longest Run": "🏅",
+        "10K": "⭐",
+        "Longest Run": "🏃",
         "Longest Ride": "🚴",
         "Total Ascent": "🚵",
         "Max Avg Power (20 min)": "🔋",
