@@ -28,7 +28,8 @@ Ensure that your environment secrets are correctly configured for secure data ac
 You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.  
 
 Here is a screenshot of what my Notion dashboard looks like:  
-![garmin-to-notion_demo](https://github.com/user-attachments/assets/b398c896-1142-41ac-bc4b-687b6641c50f)
+![garmin-to-notion-template](https://github.com/user-attachments/assets/b37077cc-fe87-466f-9424-8ba9e4efa909)
+
 
 My Notion template is available for free and can be duplicated to your Notion [here](https://www.notion.so/templates/fitness-tracker-738)
 
