@@ -6,14 +6,14 @@ import os
 def get_icon_for_record(activity_name):
     icon_map = {
         "1K": "🥇",
-        "1mi": "🛣️",
+        "1mi": "⚡",
         "5K": "👟",
         "10K": "🏃",
         "Longest Run": "🏅",
         "Longest Ride": "🚴",
         "Total Ascent": "🚵",
         "Max Avg Power (20 min)": "🔋",
-        "Most Steps in a Day": "👣",
+        "Most Steps in a Day": "https://img.icons8.com/?size=100&id=M6B0SpcxT5Sx&format=png&color=000000",
         "Most Steps in a Week": "🚶",
         "Most Steps in a Month": "📅",
         "Longest Goal Streak": "✔️",
