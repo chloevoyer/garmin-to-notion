@@ -200,8 +200,9 @@ def update_record(client, page_id, activity_date, value, pace, activity_name, is
             page_id=page_id,
             properties=properties,
             icon={"emoji": icon},
-            cover={"cover": cover}
+            cover={"type": "external", "external": {"url": cover}}
         )
+        
     except Exception as e:
         print(f"Error updating record: {e}")
 
@@ -228,7 +229,7 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
             parent={"database_id": database_id},
             properties=properties,
             icon={"emoji": icon},
-            cover={"cover": cover}
+            cover={"type": "external", "external": {"url": cover}}
         )
     except Exception as e:
         print(f"Error writing new record: {e}")
