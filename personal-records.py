@@ -21,6 +21,22 @@ def get_icon_for_record(activity_name):
     }
     return icon_map.get(activity_name, "🏅")  # Default to "Other" icon if not found
 
+def get_cover_for_record(activity_name):
+    cover_map = {
+        "1K": "https://images.unsplash.com/photo-1526676537331-7747bf8278fc?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "1mi": "https://images.unsplash.com/photo-1638183395699-2c0db5b6afbb?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "5K": "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "10K": "https://www.notion.so/image/https%3A%2F%2Fwww.shutterstock.com%2Fimage-photo%2Ffull-body-side-portrait-sporty-600nw-1232151349.jpg?table=block&id=b2397bc2-40a6-4b66-972d-2d8b42d96bd4&spaceId=5f8cbff8-587c-40dc-b000-881bd747e0a2&width=2000&userId=b35f54bf-0b56-45c2-badf-b107f94a79d3&cache=v2",
+        "Longest Run": "https://images.unsplash.com/photo-1532383282788-19b341e3c422?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Longest Ride": "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Max Avg Power (20 min)": "https://images.unsplash.com/photo-1591741535018-d042766c62eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzkyMXwwfDF8c2VhcmNofDJ8fHNwaW5uaW5nfGVufDB8fHx8MTcyNjM1Mzc0Mnww&ixlib=rb-4.0.3&q=80&w=4800",
+        "Most Steps in a Day": "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Most Steps in a Week": "https://images.unsplash.com/photo-1602174865963-9159ed37e8f1?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Most Steps in a Month": "https://images.unsplash.com/photo-1580058572462-98e2c0e0e2f0?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Longest Goal Streak": "https://images.unsplash.com/photo-1477332552946-cfb384aeaf1c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800"
+    }
+    return cover_map.get(activity_name, "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800") 
+
 def format_activity_type(activity_type):
     if activity_type is None:
         return "Walking"
@@ -177,12 +193,14 @@ def update_record(client, page_id, activity_date, value, pace, activity_name, is
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
 
     icon = get_icon_for_record(activity_name)
+    cover = get_cover_for_record(activity_name)
 
     try:
         client.pages.update(
             page_id=page_id,
             properties=properties,
-            icon={"emoji": icon}
+            icon={"emoji": icon},
+            cover={"cover": cover}
         )
     except Exception as e:
         print(f"Error updating record: {e}")
@@ -203,13 +221,14 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
         properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
     
     icon = get_icon_for_record(activity_name)
+    cover = get_cover_for_record(activity_name)
 
     try:
         client.pages.create(
             parent={"database_id": database_id},
             properties=properties,
-            icon={"emoji": icon}
-
+            icon={"emoji": icon},
+            cover={"cover": cover}
         )
     except Exception as e:
         print(f"Error writing new record: {e}")
