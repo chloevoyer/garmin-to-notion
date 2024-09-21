@@ -1,15 +1,19 @@
 name: Sync Garmin to Notion
+
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    # This cron job will run every 15 minutes from 6 AM to 11 PM Eastern Time
+    - cron: '*/15 10-3 * * *'
   workflow_dispatch:
+
+env:
+  TZ: 'America/Montreal'
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v2
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -39,3 +43,5 @@ jobs:
         run: |
           python garmin-activities.py
           python personal-records.py
+        env:
+          TZ: 'America/Montreal'
