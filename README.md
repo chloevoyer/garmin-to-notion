@@ -3,9 +3,12 @@
 This project connects your Garmin activities and personal records to your Notion database, allowing you to keep track of your performance metrics in one place.
 
 ## Features :sparkles:  
-- Automatically sync Garmin activities to Notion.
-- Extract Garmin personal records such as fastest 1K and longest ride.
-- Easy setup with clear instructions and minimal coding required.
+  🔄  Automatically sync Garmin activities to Notion in real-time  
+  📊  Track detailed activity metrics (distance, pace, heart rate)  
+  🎯  Extract and track personal records (fastest 1K, longest ride)  
+  🤖  Zero-touch automation once configured  
+  📱  Compatible with all Garmin activities and devices  
+  🔧  Easy setup with clear instructions and minimal coding required  
 
 ## Prerequisites :hammer_and_wrench:  
 - A Notion account with API access.
