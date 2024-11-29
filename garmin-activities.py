@@ -21,14 +21,22 @@ ACTIVITY_ICONS = {
     ,"Rowing": "https://img.icons8.com/?size=100&id=24889&format=png&color=000000"
     ,"Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000"
     ,"Strength Training": "https://img.icons8.com/?size=100&id=107640&format=png&color=000000"
+    ,"Stretching": "https://img.icons8.com/?size=100&id=djfOcRn1m_kh&format=png&color=000000"
     # Add more mappings as needed
 }
 
 def get_all_activities(garmin, limit=1000):
     return garmin.get_activities(0, limit)
 
-def format_activity_type(activity_type):
-    return activity_type.replace('_', ' ').title()
+def format_activity_type(activity_type, activity_name=""):
+    # First format the activity type as before
+    formatted_type = activity_type.replace('_', ' ').title() if activity_type else "Unknown"
+    
+    # Check if "Stretch" appears in the activity name (case insensitive)
+    if activity_name and "stretch" in activity_name.lower():
+        return "Stretching"
+    
+    return formatted_type
 
 def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
@@ -121,8 +129,11 @@ def create_activity(client, database_id, activity):
     Create a new activity in the Notion database.
     """
     activity_date = activity.get('startTimeGMT')
-    activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
     activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
+    activity_type = format_activity_type(
+        activity.get('activityType', {}).get('typeKey', 'Unknown'),
+        activity_name
+    )
     
     # Get icon for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_type)
