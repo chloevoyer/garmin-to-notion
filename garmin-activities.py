@@ -73,12 +73,15 @@ def activity_exists(client, database_id, activity_date, activity_type, activity_
     """
     Check if an activity already exists in the Notion database and return it if found.
     """
+    # Determine the correct activity type for the lookup
+    lookup_type = "Stretching" if "stretch" in activity_name.lower() else activity_type
+    
     query = client.databases.query(
         database_id=database_id,
         filter={
             "and": [
                 {"property": "Date", "date": {"equals": activity_date.split('T')[0]}},
-                {"property": "Activity Type", "select": {"equals": activity_type}},
+                {"property": "Activity Type", "select": {"equals": lookup_type}},
                 {"property": "Activity Name", "title": {"equals": activity_name}}
             ]
         }
@@ -91,6 +94,14 @@ def activity_needs_update(existing_activity, new_activity):
     Compare existing activity with new activity data to determine if an update is needed.
     """
     existing_props = existing_activity['properties']
+    
+    # Get the activity name to determine if it's a stretching activity
+    activity_name = new_activity.get('activityName', '').lower()
+    activity_type = format_activity_type(
+        new_activity.get('activityType', {}).get('typeKey', 'Unknown'),
+        activity_name
+    )
+    
     return (
         existing_props['Distance (km)']['number'] != round(new_activity.get('distance', 0) / 1000, 2) or
         existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
@@ -101,27 +112,8 @@ def activity_needs_update(existing_activity, new_activity):
         existing_props['Aerobic Effect']['select']['name'] != format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown')) or
         existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 0), 1) or
         existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
-        existing_props['PR']['checkbox'] != new_activity.get('pr', False)
-    )
-
-def update_activity(client, existing_activity, new_activity):
-    """
-    Update an existing activity in the Notion database with new data.
-    """
-    client.pages.update(
-        page_id=existing_activity['id'],
-        properties={
-            "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
-            "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
-            "Calories": {"number": new_activity.get('calories', 0)},
-            "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
-            "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
-            "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 0), 1)},
-            "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-            "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 0), 1)},
-            "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
-            "PR": {"checkbox": new_activity.get('pr', False)}
-        }
+        existing_props['PR']['checkbox'] != new_activity.get('pr', False) or
+        existing_props['Activity Type']['select']['name'] != activity_type
     )
 
 def create_activity(client, database_id, activity):
@@ -149,8 +141,8 @@ def create_activity(client, database_id, activity):
         "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
         "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 0), 1)},
         "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-        "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 0), 1)},
-        "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
+        "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 0), 1)},
+        "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
         "PR": {"checkbox": activity.get('pr', False)}
     }
     
@@ -168,12 +160,17 @@ def update_activity(client, existing_activity, new_activity):
     """
     Update an existing activity in the Notion database with new data.
     """
-    activity_type = format_activity_type(new_activity.get('activityType', {}).get('typeKey', 'Unknown'))
+    activity_name = new_activity.get('activityName', 'Unnamed Activity')
+    activity_type = format_activity_type(
+        new_activity.get('activityType', {}).get('typeKey', 'Unknown'),
+        activity_name
+    )
     
     # Get icon for the activity type
     icon_url = ACTIVITY_ICONS.get(activity_type)
     
     properties = {
+        "Activity Type": {"select": {"name": activity_type}},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": new_activity.get('calories', 0)},
@@ -214,19 +211,22 @@ def main():
     # Process all activities
     for activity in activities:
         activity_date = activity.get('startTimeGMT')
-        activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
+        base_activity_type = format_activity_type(
+            activity.get('activityType', {}).get('typeKey', 'Unknown'),
+            activity_name  # Pass activity_name here
+        )
         
         # Check if activity already exists in Notion
-        existing_activity = activity_exists(client, database_id, activity_date, activity_type, activity_name)
+        existing_activity = activity_exists(client, database_id, activity_date, base_activity_type, activity_name)
         
         if existing_activity:
             if activity_needs_update(existing_activity, activity):
                 update_activity(client, existing_activity, activity)
-                # print(f"Updated: {activity_type} - {activity_name}")
+                # print(f"Updated: {base_activity_type} - {activity_name}")
         else:
             create_activity(client, database_id, activity)
-            # print(f"Created: {activity_type} - {activity_name}")
+            # print(f"Created: {base_activity_type} - {activity_name}")
 
 if __name__ == '__main__':
     main()
