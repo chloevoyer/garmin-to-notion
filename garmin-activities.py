@@ -141,8 +141,8 @@ def create_activity(client, database_id, activity):
         "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
         "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 0), 1)},
         "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
-        "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 0), 1)},
-        "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
+        "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 0), 1)},
+        "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
         "PR": {"checkbox": activity.get('pr', False)}
     }
     
@@ -155,7 +155,7 @@ def create_activity(client, database_id, activity):
         page["icon"] = {"type": "external", "external": {"url": icon_url}}
     
     client.pages.create(**page)
-
+    
 def update_activity(client, existing_activity, new_activity):
     """
     Update an existing activity in the Notion database with new data.
