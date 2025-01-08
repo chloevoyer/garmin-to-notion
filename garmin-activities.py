@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from garminconnect import Garmin
 from notion_client import Client
+from dotenv import load_dotenv
 import pytz
 import os
 
@@ -34,28 +35,33 @@ def get_all_activities(garmin, limit=1000):
 def format_activity_type(activity_type, activity_name=""):
     # First format the activity type as before
     formatted_type = activity_type.replace('_', ' ').title() if activity_type else "Unknown"
-    
-    # Replace 'Rowing V2' with 'Rowing'
-    if formatted_type == "Rowing V2":
-        formatted_type = "Rowing"
 
-    # Replace 'Treadmill Running' with 'Running'
-    if formatted_type == "Treadmill Running":
-        formatted_type = "Running"
+    # Initialize subtype as the same as the main type
+    activity_subtype = formatted_type
+    activity_type = formatted_type
 
-    # Replace 'Speed Walking' with 'Walking'
-    if formatted_type == "Speed Walking":
-        formatted_type = "Walking"
+    # Map of specific subtypes to their main types
+    activity_mapping = {
+        "Treadmill Running": "Running",
+        "Indoor Cycling": "Cycling",
+        "Indoor Rowing": "Rowing",
+        "Speed Walking": "Walking",
+        "Indoor Cardio": "Cardio",
+        "Rowing V2": "Rowing"
+    }
 
-    # Check if "Stretch" appears in the activity name (case insensitive)
+    # If the formatted type is in our mapping, update both main type and subtype
+    if formatted_type in activity_mapping:
+        activity_type = activity_mapping[formatted_type]
+        activity_subtype = formatted_type
+
+    # Special cases for activity names
     if activity_name and "meditation" in activity_name.lower():
-        return "Meditation"
-
-    # Check if "Stretch" appears in the activity name (case insensitive)
+        return "Meditation", "Meditation"
     if activity_name and "stretch" in activity_name.lower():
-        return "Stretching"
+        return "Stretching", "Stretching"
     
-    return formatted_type
+    return activity_type, activity_subtype
 
 def format_entertainment(activity_name):
     return activity_name.replace('ENTERTAINMENT', 'Netflix')
@@ -89,11 +95,17 @@ def format_pace(average_speed):
         return ""
     
 def activity_exists(client, database_id, activity_date, activity_type, activity_name):
-    """
-    Check if an activity already exists in the Notion database and return it if found.
-    """
+
+    # Check if an activity already exists in the Notion database and return it if found.
+
+    # Handle the activity_type which is now a tuple
+    if isinstance(activity_type, tuple):
+        main_type, _ = activity_type
+    else:
+        main_type = activity_type[0] if isinstance(activity_type, (list, tuple)) else activity_type
+    
     # Determine the correct activity type for the lookup
-    lookup_type = "Stretching" if "stretch" in activity_name.lower() else activity_type
+    lookup_type = "Stretching" if "stretch" in activity_name.lower() else main_type
     
     query = client.databases.query(
         database_id=database_id,
@@ -108,17 +120,21 @@ def activity_exists(client, database_id, activity_date, activity_type, activity_
     results = query['results']
     return results[0] if results else None
 
+
 def activity_needs_update(existing_activity, new_activity):
-    """
-    Compare existing activity with new activity data to determine if an update is needed.
-    """
     existing_props = existing_activity['properties']
     
-    # Get the activity name to determine if it's a stretching activity
     activity_name = new_activity.get('activityName', '').lower()
-    activity_type = format_activity_type(
+    activity_type, activity_subtype = format_activity_type(
         new_activity.get('activityType', {}).get('typeKey', 'Unknown'),
         activity_name
+    )
+    
+    # Check if 'Subactivity Type' property exists
+    has_subactivity = (
+        'Subactivity Type' in existing_props and 
+        existing_props['Subactivity Type'] is not None and
+        existing_props['Subactivity Type'].get('select') is not None
     )
     
     return (
@@ -132,16 +148,17 @@ def activity_needs_update(existing_activity, new_activity):
         existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 0), 1) or
         existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
         existing_props['PR']['checkbox'] != new_activity.get('pr', False) or
-        existing_props['Activity Type']['select']['name'] != activity_type
+        existing_props['Activity Type']['select']['name'] != activity_type or
+        (has_subactivity and existing_props['Subactivity Type']['select']['name'] != activity_subtype) or
+        (not has_subactivity)  # If the property doesn't exist, we need an update
     )
 
 def create_activity(client, database_id, activity):
-    """
-    Create a new activity in the Notion database.
-    """
+
+    # Create a new activity in the Notion database
     activity_date = activity.get('startTimeGMT')
     activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
-    activity_type = format_activity_type(
+    activity_type, activity_subtype = format_activity_type(
         activity.get('activityType', {}).get('typeKey', 'Unknown'),
         activity_name
     )
@@ -152,6 +169,7 @@ def create_activity(client, database_id, activity):
     properties = {
         "Date": {"date": {"start": activity_date}},
         "Activity Type": {"select": {"name": activity_type}},
+        "Subactivity Type": {"select": {"name": activity_subtype}},
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
         "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
@@ -176,11 +194,10 @@ def create_activity(client, database_id, activity):
     client.pages.create(**page)
     
 def update_activity(client, existing_activity, new_activity):
-    """
-    Update an existing activity in the Notion database with new data.
-    """
+
+    # Update an existing activity in the Notion database with new data
     activity_name = new_activity.get('activityName', 'Unnamed Activity')
-    activity_type = format_activity_type(
+    activity_type, activity_subtype = format_activity_type(
         new_activity.get('activityType', {}).get('typeKey', 'Unknown'),
         activity_name
     )
@@ -190,6 +207,7 @@ def update_activity(client, existing_activity, new_activity):
     
     properties = {
         "Activity Type": {"select": {"name": activity_type}},
+        "Subactivity Type": {"select": {"name": activity_subtype}},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(new_activity.get('calories', 0))},
@@ -213,6 +231,8 @@ def update_activity(client, existing_activity, new_activity):
     client.pages.update(**update)
 
 def main():
+    load_dotenv()
+
     # Initialize Garmin and Notion clients using environment variables
     garmin_email = os.getenv("GARMIN_EMAIL")
     garmin_password = os.getenv("GARMIN_PASSWORD")
@@ -231,21 +251,21 @@ def main():
     for activity in activities:
         activity_date = activity.get('startTimeGMT')
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
-        base_activity_type = format_activity_type(
+        activity_type, activity_subtype = format_activity_type(
             activity.get('activityType', {}).get('typeKey', 'Unknown'),
-            activity_name  # Pass activity_name here
+            activity_name
         )
         
         # Check if activity already exists in Notion
-        existing_activity = activity_exists(client, database_id, activity_date, base_activity_type, activity_name)
+        existing_activity = activity_exists(client, database_id, activity_date, activity_type, activity_name)
         
         if existing_activity:
             if activity_needs_update(existing_activity, activity):
                 update_activity(client, existing_activity, activity)
-                # print(f"Updated: {base_activity_type} - {activity_name}")
+                # print(f"Updated: {activity_type} - {activity_name}")
         else:
             create_activity(client, database_id, activity)
-            # print(f"Created: {base_activity_type} - {activity_name}")
+            # print(f"Created: {activity_type} - {activity_name}")
 
 if __name__ == '__main__':
     main()
