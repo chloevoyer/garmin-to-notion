@@ -8,20 +8,22 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
-    "Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000"
-    ,"Treadmill Running": "https://img.icons8.com/?size=100&id=9794&format=png&color=000000"
-    ,"Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000"
-    ,"Indoor Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000"
-    ,"Swimming": "https://img.icons8.com/?size=100&id=9777&format=png&color=000000"
-    ,"Indoor Cardio": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000"
-    ,"Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000"
-    ,"Pilates": "https://img.icons8.com/?size=100&id=9774&format=png&color=000000"
-    ,"Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000"
-    ,"Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000"
-    ,"Rowing": "https://img.icons8.com/?size=100&id=24889&format=png&color=000000"
-    ,"Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000"
-    ,"Strength Training": "https://img.icons8.com/?size=100&id=107640&format=png&color=000000"
-    ,"Stretching": "https://img.icons8.com/?size=100&id=djfOcRn1m_kh&format=png&color=000000"
+    "Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000",
+    "Cardio": "https://img.icons8.com/?size=100&id=71221&format=png&color=000000",
+    "Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
+    "Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000",
+    "Indoor Cardio": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000",
+    "Indoor Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
+    "Indoor Rowing": "https://img.icons8.com/?size=100&id=71098&format=png&color=000000",
+    "Pilates": "https://img.icons8.com/?size=100&id=9774&format=png&color=000000",
+    "Rowing": "https://img.icons8.com/?size=100&id=71491&format=png&color=000000",
+    "Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000",
+    "Strength Training": "https://img.icons8.com/?size=100&id=107640&format=png&color=000000",
+    "Stretching": "https://img.icons8.com/?size=100&id=djfOcRn1m_kh&format=png&color=000000",
+    "Swimming": "https://img.icons8.com/?size=100&id=9777&format=png&color=000000",
+    "Treadmill Running": "https://img.icons8.com/?size=100&id=9794&format=png&color=000000",
+    "Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000",
+    "Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000",
     # Add more mappings as needed
 }
 
@@ -32,6 +34,22 @@ def format_activity_type(activity_type, activity_name=""):
     # First format the activity type as before
     formatted_type = activity_type.replace('_', ' ').title() if activity_type else "Unknown"
     
+    # Replace 'Rowing V2' with 'Rowing'
+    if formatted_type == "Rowing V2":
+        formatted_type = "Rowing"
+
+    # Replace 'Treadmill Running' with 'Running'
+    if formatted_type == "Treadmill Running":
+        formatted_type = "Running"
+
+    # Replace 'Breathwork' with 'Meditation'
+    if formatted_type == "Breathwork":
+        formatted_type = "Meditation"
+
+    # Replace 'Speed Walking' with 'Walking'
+    if formatted_type == "Speed Walking":
+        formatted_type = "Walking"
+
     # Check if "Stretch" appears in the activity name (case insensitive)
     if activity_name and "stretch" in activity_name.lower():
         return "Stretching"
@@ -68,7 +86,7 @@ def format_pace(average_speed):
         return f"{minutes}:{seconds:02d} min/km"
     else:
         return ""
-
+    
 def activity_exists(client, database_id, activity_date, activity_type, activity_name):
     """
     Check if an activity already exists in the Notion database and return it if found.
@@ -173,7 +191,7 @@ def update_activity(client, existing_activity, new_activity):
         "Activity Type": {"select": {"name": activity_type}},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
-        "Calories": {"number": new_activity.get('calories', 0)},
+        "Calories": {"number": int(new_activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
         "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
         "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 0), 1)},
