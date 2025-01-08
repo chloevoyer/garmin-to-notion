@@ -123,7 +123,7 @@ def activity_needs_update(existing_activity, new_activity):
     return (
         existing_props['Distance (km)']['number'] != round(new_activity.get('distance', 0) / 1000, 2) or
         existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
-        existing_props['Calories']['number'] != new_activity.get('calories', 0) or
+        existing_props['Calories']['number'] != round(new_activity.get('calories', 0)) or
         existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
         existing_props['Training Effect']['select']['name'] != format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown')) or
         existing_props['Aerobic']['number'] != round(new_activity.get('aerobicTrainingEffect', 0), 1) or
@@ -154,7 +154,7 @@ def create_activity(client, database_id, activity):
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
         "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
-        "Calories": {"number": activity.get('calories', 0)},
+        "Calories": {"number": round(activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
         "Training Effect": {"select": {"name": format_training_effect(activity.get('trainingEffectLabel', 'Unknown'))}},
         "Aerobic": {"number": round(activity.get('aerobicTrainingEffect', 0), 1)},
@@ -191,7 +191,7 @@ def update_activity(client, existing_activity, new_activity):
         "Activity Type": {"select": {"name": activity_type}},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
-        "Calories": {"number": int(new_activity.get('calories', 0))},
+        "Calories": {"number": round(new_activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
         "Training Effect": {"select": {"name": format_training_effect(new_activity.get('trainingEffectLabel', 'Unknown'))}},
         "Aerobic": {"number": round(new_activity.get('aerobicTrainingEffect', 0), 1)},
