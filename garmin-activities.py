@@ -9,6 +9,7 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
+    "Barre": "https://img.icons8.com/?size=100&id=FVcvaPMs0stN&format=png&color=000000",
     "Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000",
     "Cardio": "https://img.icons8.com/?size=100&id=71221&format=png&color=000000",
     "Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
@@ -42,13 +43,23 @@ def format_activity_type(activity_type, activity_name=""):
 
     # Map of specific subtypes to their main types
     activity_mapping = {
-        "Treadmill Running": "Running",
+        "Barre": "Strength",
+        "Indoor Cardio": "Cardio",
         "Indoor Cycling": "Cycling",
         "Indoor Rowing": "Rowing",
         "Speed Walking": "Walking",
-        "Indoor Cardio": "Cardio",
-        "Rowing V2": "Rowing"
+        "Strength Training": "Strength",
+        "Treadmill Running": "Running"
     }
+
+    # Special replacement for Rowing V2
+    if formatted_type == "Rowing V2":
+        activity_type = "Rowing"
+
+    # Special case for Yoga and Pilates
+    elif formatted_type in ["Yoga", "Pilates"]:
+        activity_type = "Yoga/Pilates"
+        activity_subtype = formatted_type
 
     # If the formatted type is in our mapping, update both main type and subtype
     if formatted_type in activity_mapping:
@@ -58,6 +69,8 @@ def format_activity_type(activity_type, activity_name=""):
     # Special cases for activity names
     if activity_name and "meditation" in activity_name.lower():
         return "Meditation", "Meditation"
+    if activity_name and "barre" in activity_name.lower():
+        return "Strength", "Barre"
     if activity_name and "stretch" in activity_name.lower():
         return "Stretching", "Stretching"
     
@@ -164,7 +177,7 @@ def create_activity(client, database_id, activity):
     )
     
     # Get icon for the activity type
-    icon_url = ACTIVITY_ICONS.get(activity_type)
+    icon_url = ACTIVITY_ICONS.get(activity_subtype if activity_subtype != activity_type else activity_type)
     
     properties = {
         "Date": {"date": {"start": activity_date}},
@@ -203,7 +216,7 @@ def update_activity(client, existing_activity, new_activity):
     )
     
     # Get icon for the activity type
-    icon_url = ACTIVITY_ICONS.get(activity_type)
+    icon_url = ACTIVITY_ICONS.get(activity_subtype if activity_subtype != activity_type else activity_type)
     
     properties = {
         "Activity Type": {"select": {"name": activity_type}},
