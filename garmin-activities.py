@@ -8,13 +8,13 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
-    "Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000",
     "Cardio": "https://img.icons8.com/?size=100&id=71221&format=png&color=000000",
     "Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
     "Hiking": "https://img.icons8.com/?size=100&id=9844&format=png&color=000000",
     "Indoor Cardio": "https://img.icons8.com/?size=100&id=62779&format=png&color=000000",
     "Indoor Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
     "Indoor Rowing": "https://img.icons8.com/?size=100&id=71098&format=png&color=000000",
+    "Meditation": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000",
     "Pilates": "https://img.icons8.com/?size=100&id=9774&format=png&color=000000",
     "Rowing": "https://img.icons8.com/?size=100&id=71491&format=png&color=000000",
     "Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000",
