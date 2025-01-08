@@ -9,7 +9,7 @@ import os
 local_tz = pytz.timezone('America/Toronto')
 
 ACTIVITY_ICONS = {
-    "Barre": "https://img.icons8.com/?size=100&id=FVcvaPMs0stN&format=png&color=000000",
+    "Barre": "https://img.icons8.com/?size=100&id=66924&format=png&color=000000",
     "Breathwork": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000",
     "Cardio": "https://img.icons8.com/?size=100&id=71221&format=png&color=000000",
     "Cycling": "https://img.icons8.com/?size=100&id=47443&format=png&color=000000",
