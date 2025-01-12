@@ -15,7 +15,8 @@ This project connects your Garmin activities and personal records to your Notion
 - A Garmin Connect account to pull activity data.
 - If you wish to sync your Peloton workouts with Garmin, see [peloton-to-garmin](https://github.com/philosowaffle/peloton-to-garmin)
 ## Getting Started :dart:
-Follow these steps to set up the integration:
+A detailed step-by-step guide is provided on my Notion template [here](https://chloevoyer.notion.site/Set-up-Guide-17915ce7058880559a3ac9f8a0720046).
+For more advanced users, follow these steps to set up the integration:
 ### 1. Set Environment Secrets
 Ensure that your environment secrets are correctly configured for secure data access.
 ### 2. Create Notion Token
