@@ -17,13 +17,26 @@ This project connects your Garmin activities and personal records to your Notion
 ## Getting Started :dart:
 A detailed step-by-step guide is provided on my Notion template [here](https://chloevoyer.notion.site/Set-up-Guide-17915ce7058880559a3ac9f8a0720046).
 For more advanced users, follow these steps to set up the integration:
-### 1. Set Environment Secrets
-Ensure that your environment secrets are correctly configured for secure data access.
-### 2. Create Notion Token
+### 1. For this GitHub Repository
+### 2. Duplicate my [Notion Template](https://www.notion.so/templates/fitness-tracker-738)
+* Save your Activities and Personal Records database ID (you will need it for step 4)
+  * Optional: Daily Steps database ID
+  * Look at the URL: notion.so/username/[string-of-characters]
+  * The database ID for this database is everything after your “username/“ and before the “?v”
+### 3. Create Notion Token
 * Go to [Notion Integrations](https://www.notion.so/profile/integrations).
 * [Create](https://developers.notion.com/docs/create-a-notion-integration) a new integration and copy the integration token.
 * [Share](https://www.notion.so/help/add-and-manage-connections-with-the-api#enterprise-connection-settings) the integration with the target database in Notion.
-### 3. Run Scripts (if not using automatic workflow)
+### 4. Set Environment Secrets
+* Ensure that your environment secrets are correctly configured for secure data access.
+* Environment secrets to define:
+  * GARMIN_EMAIL
+  * GARMIN_PASSWORD
+  * NOTION_TOKEN
+  * NOTION_DB_ID
+  * NOTION_PR_DB_ID
+  * NOTION_STEPS_DB_ID (optional)
+### 5. Run Scripts (if not using automatic workflow)
 * Run [garmin-activities.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/garmin-activities.py) to sync your Garmin activities to Notion.  
 `python garmin-activities.py`
 * Run [person-records.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/personal-records.py) to extract activity records (e.g., fastest run, longest ride).  
