@@ -50,11 +50,14 @@ def update_daily_steps(client, existing_steps, new_steps):
     """
     Update an existing daily steps entry in the Notion database with new data.
     """
+    total_distance = new_steps.get('totalDistance')
+    if total_distance is None:
+        total_distance = 0
     properties = {
         "Activity Type":  {"title": [{"text": {"content": "Walking"}}]},
         "Total Steps": {"number": new_steps.get('totalSteps')},
         "Step Goal": {"number": new_steps.get('stepGoal')},
-        "Total Distance (km)": {"number": new_steps.get('totalDistance')}
+        "Total Distance (km)": {"number": round(total_distance / 1000, 2)}
     }
     
     update = {
@@ -68,12 +71,15 @@ def create_daily_steps(client, database_id, steps):
     """
     Create a new daily steps entry in the Notion database.
     """
+    total_distance = steps.get('totalDistance')
+    if total_distance is None:
+        total_distance = 0
     properties = {
         "Activity Type": {"title": [{"text": {"content": "Walking"}}]},
         "Date": {"date": {"start": steps.get('calendarDate')}},
         "Total Steps": {"number": steps.get('totalSteps')},
         "Step Goal": {"number": steps.get('stepGoal')},
-        "Total Distance (km)": {"number": steps.get('totalDistance')}
+        "Total Distance (km)": {"number": round(total_distance / 1000, 2)}
     }
     
     page = {
