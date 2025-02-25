@@ -5,7 +5,7 @@ from dotenv import load_dotenv, dotenv_values
 import pytz
 
 # Constants
-local_tz = pytz.timezone("America/New_York")
+local_tz = pytz.timezone("America/Chicago")
 
 # Load environment variables
 load_dotenv()
