@@ -6,6 +6,8 @@ This project connects your Garmin activities and personal records to your Notion
   🔄  Automatically sync Garmin activities to Notion in real-time  
   📊  Track detailed activity metrics (distance, pace, heart rate)  
   🎯  Extract and track personal records (fastest 1K, longest ride)  
+  👣  Optional daily steps tracker
+  😴  Optional sleep data tracker  
   🤖  Zero-touch automation once configured  
   📱  Compatible with all Garmin activities and devices  
   🔧  Easy setup with clear instructions and minimal coding required  
@@ -22,7 +24,7 @@ For more advanced users, follow these steps to set up the integration:
 * Save your Activities and Personal Records database ID (you will need it for step 4)
   * Optional: Daily Steps database ID
   * Look at the URL: notion.so/username/[string-of-characters]
-  * The database ID for this database is everything after your “username/“ and before the “?v”
+  * The database ID is everything after your “username/“ and before the “?v”
 ### 3. Create Notion Token
 * Go to [Notion Integrations](https://www.notion.so/profile/integrations).
 * [Create](https://developers.notion.com/docs/create-a-notion-integration) a new integration and copy the integration token.
@@ -35,12 +37,13 @@ For more advanced users, follow these steps to set up the integration:
   * NOTION_DB_ID
   * NOTION_PR_DB_ID
   * NOTION_STEPS_DB_ID (optional)
+  * NOTION_SLEEP_DB_ID (optional)
 ### 5. Run Scripts (if not using automatic workflow)
 * Run [garmin-activities.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/garmin-activities.py) to sync your Garmin activities to Notion.  
 `python garmin-activities.py`
 * Run [person-records.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/personal-records.py) to extract activity records (e.g., fastest run, longest ride).  
 `python personal-records.py` 
-## Example Configuration :pencil:    
+## Example Configuration :pencil:  
 You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.  
 
 Here is a screenshot of what my Notion dashboard looks like:  
@@ -59,5 +62,3 @@ Contributions are welcome! If you find a bug or want to add a feature, feel free
 
 ## :copyright: License  
 This project is licensed under the MIT License. See the LICENSE file for more details.
-
-

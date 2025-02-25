@@ -163,6 +163,7 @@ def activity_needs_update(existing_activity, new_activity):
         existing_props['Anaerobic']['number'] != round(new_activity.get('anaerobicTrainingEffect', 0), 1) or
         existing_props['Anaerobic Effect']['select']['name'] != format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown')) or
         existing_props['PR']['checkbox'] != new_activity.get('pr', False) or
+        existing_props['Fav']['checkbox'] != new_activity.get('favorite', False) or
         existing_props['Activity Type']['select']['name'] != activity_type or
         (has_subactivity and existing_props['Subactivity Type']['select']['name'] != activity_subtype) or
         (not has_subactivity)  # If the property doesn't exist, we need an update
@@ -197,7 +198,8 @@ def create_activity(client, database_id, activity):
         "Aerobic Effect": {"select": {"name": format_training_message(activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
         "Anaerobic": {"number": round(activity.get('anaerobicTrainingEffect', 0), 1)},
         "Anaerobic Effect": {"select": {"name": format_training_message(activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
-        "PR": {"checkbox": activity.get('pr', False)}
+        "PR": {"checkbox": activity.get('pr', False)},
+        "Fav": {"checkbox": activity.get('favorite', False)}
     }
     
     page = {
@@ -236,7 +238,8 @@ def update_activity(client, existing_activity, new_activity):
         "Aerobic Effect": {"select": {"name": format_training_message(new_activity.get('aerobicTrainingEffectMessage', 'Unknown'))}},
         "Anaerobic": {"number": round(new_activity.get('anaerobicTrainingEffect', 0), 1)},
         "Anaerobic Effect": {"select": {"name": format_training_message(new_activity.get('anaerobicTrainingEffectMessage', 'Unknown'))}},
-        "PR": {"checkbox": new_activity.get('pr', False)}
+        "PR": {"checkbox": new_activity.get('pr', False)},
+        "Fav": {"checkbox": new_activity.get('favorite', False)}
     }
     
     update = {
