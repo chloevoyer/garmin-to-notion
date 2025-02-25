@@ -3,6 +3,7 @@ from garminconnect import Garmin
 from notion_client import Client
 from dotenv import load_dotenv, dotenv_values
 import pytz
+import os
 
 # Constants
 local_tz = pytz.timezone("America/New_York")
