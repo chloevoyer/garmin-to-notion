@@ -78,21 +78,24 @@ def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
     print(f"Created sleep entry for: {sleep_date}")
 
 def main():
-    garmin = Garmin(CONFIG["GARMIN_EMAIL"], CONFIG["GARMIN_PASSWORD"])
-    notion_client = Client(auth=CONFIG["NOTION_TOKEN"])
-    database_id = CONFIG["NOTION_SLEEP_DB_ID"]
+    load_dotenv()
 
-    try:
-        garmin.login()
-    except Exception as e:
-        print("Failed to log in to Garmin:", e)
-        return
+    # Initialize Garmin and Notion clients using environment variables
+    garmin_email = os.getenv("GARMIN_EMAIL")
+    garmin_password = os.getenv("GARMIN_PASSWORD")
+    notion_token = os.getenv("NOTION_TOKEN")
+    database_id = os.getenv["NOTION_SLEEP_DB_ID"]
+
+    # Initialize Garmin client and login
+    garmin = Garmin(garmin_email, garmin_password)
+    garmin.login()
+    client = Client(auth=notion_token)
 
     data = get_sleep_data(garmin)
     if data:
         sleep_date = data.get('dailySleepDTO', {}).get('calendarDate')
-        if sleep_date and not sleep_data_exists(notion_client, database_id, sleep_date):
-            create_sleep_data(notion_client, database_id, data, skip_zero_sleep=True)
+        if sleep_date and not sleep_data_exists(client, database_id, sleep_date):
+            create_sleep_data(client, database_id, data, skip_zero_sleep=True)
 
 if __name__ == '__main__':
     main()
