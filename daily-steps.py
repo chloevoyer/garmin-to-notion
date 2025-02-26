@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from garminconnect import Garmin
 from notion_client import Client
 from dotenv import load_dotenv

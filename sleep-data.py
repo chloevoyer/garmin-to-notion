@@ -53,6 +53,7 @@ def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
         (daily_sleep.get(k, 0) or 0) for k in ['deepSleepSeconds', 'lightSleepSeconds', 'remSleepSeconds']
     )
     
+    
     if skip_zero_sleep and total_sleep == 0:
         print(f"Skipping sleep data for {sleep_date} as total sleep is 0")
         return
