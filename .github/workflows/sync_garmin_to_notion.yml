@@ -8,7 +8,7 @@ on:
     - cron: '0 1 * * *' # Daily
   workflow_dispatch:
 env:
-  TZ: 'America/Montreal'
+  TZ: 'Europe/Paris'
 
 jobs:
   sync:
@@ -43,7 +43,7 @@ jobs:
           NOTION_PR_DB_ID: ${{ secrets.NOTION_PR_DB_ID }}
           NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
           NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
-          TZ: 'America/Montreal'
+          TZ: 'Europe/Paris'
         run: |
           python garmin-activities.py
           python personal-records.py
