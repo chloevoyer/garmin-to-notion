@@ -27,6 +27,10 @@ ACTIVITY_ICONS = {
     "Treadmill Running": "https://img.icons8.com/?size=100&id=9794&format=png&color=000000",
     "Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000",
     "Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000",
+    "Badminton": "https://img.icons8.com/?size=100&id=24312&format=png&color=000000",
+    "Cross Country Skiing": "https://img.icons8.com/?size=100&id=75362&format=png&color=000000",
+    "Skiing/Snowboarding": "https://img.icons8.com/?size=100&id=9776&format=png&color=000000",
+    
     # Add more mappings as needed
 }
 
@@ -46,20 +50,38 @@ def format_activity_type(activity_type, activity_name=""):
         "Barre": "Strength",
         "Indoor Cardio": "Cardio",
         "Indoor Cycling": "Cycling",
+        "Road Biking": "Cycling",
         "Indoor Rowing": "Rowing",
         "Speed Walking": "Walking",
+        "Casual Walking": "Walking",
         "Strength Training": "Strength",
-        "Treadmill Running": "Running"
+        "Lap Swimming": "Swimming",
+        "Treadmill Running": "Running",
+        "Street Running": "Running",
+        "Trail Running": "Running"
     }
 
     # Special replacement for Rowing V2
     if formatted_type == "Rowing V2":
         activity_type = "Rowing"
-
+        
+    # Special replacement for Paddling V2
+    if formatted_type == "Paddling V2":
+        activity_type = "Paddling"
+        
     # Special case for Yoga and Pilates
     elif formatted_type in ["Yoga", "Pilates"]:
         activity_type = "Yoga/Pilates"
         activity_subtype = formatted_type
+
+    # Special case for snow sports
+    elif formatted_type == "Cross Country Skiing Ws":
+        activity_type = "Snow sports"
+        activity_subtype = "Cross Country Skiing"
+
+    elif formatted_type == "Resort Skiing Snowboarding Ws":
+        activity_type = "Snow sports"
+        activity_subtype = "Skiing/Snowboarding"
 
     # If the formatted type is in our mapping, update both main type and subtype
     if formatted_type in activity_mapping:
@@ -73,6 +95,8 @@ def format_activity_type(activity_type, activity_name=""):
         return "Strength", "Barre"
     if activity_name and "stretch" in activity_name.lower():
         return "Stretching", "Stretching"
+    if activity_name and "badminton" in activity_name.lower():
+        return "Badminton", "Badminton"
     
     return activity_type, activity_subtype
 
@@ -153,6 +177,7 @@ def activity_needs_update(existing_activity, new_activity):
     return (
         existing_props['Distance (km)']['number'] != round(new_activity.get('distance', 0) / 1000, 2) or
         existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
+        existing_props['Duration (h)']['number'] != round(new_activity.get('duration', 0), 2) or
         existing_props['Calories']['number'] != round(new_activity.get('calories', 0)) or
         existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
         existing_props['Avg Power']['number'] != round(new_activity.get('avgPower', 0), 1) or
@@ -189,6 +214,7 @@ def create_activity(client, database_id, activity):
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
         "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
+        "Duration (h)": {"number": round(activity.get('duration', 0), 2)},
         "Calories": {"number": round(activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
         "Avg Power": {"number": round(activity.get('avgPower', 0), 1)},
@@ -229,6 +255,7 @@ def update_activity(client, existing_activity, new_activity):
         "Subactivity Type": {"select": {"name": activity_subtype}},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
+        "Duration (h)": {"number": round(new_activity.get('duration', 0), 2)},
         "Calories": {"number": round(new_activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
         "Avg Power": {"number": round(new_activity.get('avgPower', 0), 1)},
