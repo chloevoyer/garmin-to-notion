@@ -21,6 +21,7 @@ ACTIVITY_ICONS = {
     "Meditation": "https://img.icons8.com/?size=100&id=9798&format=png&color=000000",
     "Rowing": "https://img.icons8.com/?size=100&id=71491&format=png&color=000000",
     "Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000",
+    "Trail Running": "https://img.icons8.com/?size=100&id=k1l1XFkME39t&format=png&color=000000",
     "Strength Training": "https://img.icons8.com/?size=100&id=107640&format=png&color=000000",
     "Stretching": "https://img.icons8.com/?size=100&id=djfOcRn1m_kh&format=png&color=000000",
     "Swimming": "https://img.icons8.com/?size=100&id=9777&format=png&color=000000",
