@@ -5,11 +5,14 @@ import os
 
 def get_icon_for_record(activity_name):
     icon_map = {
-        "1K": "🥇",
+        "1K": "👍",
         "1mi": "⚡",
         "5K": "👟",
         "10K": "⭐",
+        "Half marathon": "🥇",
+        "Marathon": "🏆",
         "Longest Run": "🏃",
+        "40K": "🚴",
         "Longest Ride": "🚴",
         "Total Ascent": "🚵",
         "Max Avg Power (20 min)": "🔋",
@@ -27,8 +30,12 @@ def get_cover_for_record(activity_name):
         "1mi": "https://images.unsplash.com/photo-1638183395699-2c0db5b6afbb?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
         "5K": "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
         "10K": "https://images.unsplash.com/photo-1529339944280-1a37d3d6fa8c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Half marathon": "https://images.unsplash.com/photo-1529339944280-1a37d3d6fa8c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Marathon": "https://images.unsplash.com/photo-1529339944280-1a37d3d6fa8c?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
         "Longest Run": "https://images.unsplash.com/photo-1532383282788-19b341e3c422?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "40K": "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
         "Longest Ride": "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
+        "Total Ascent": "https://images.unsplash.com/photo-1471506480208-91b3a4cc78be?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
         "Max Avg Power (20 min)": "https://images.unsplash.com/photo-1591741535018-d042766c62eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w2MzkyMXwwfDF8c2VhcmNofDJ8fHNwaW5uaW5nfGVufDB8fHx8MTcyNjM1Mzc0Mnww&ixlib=rb-4.0.3&q=80&w=4800",
         "Most Steps in a Day": "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
         "Most Steps in a Week": "https://images.unsplash.com/photo-1602174865963-9159ed37e8f1?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=4800",
@@ -95,6 +102,40 @@ def format_garmin_value(value, activity_type, typeId):
         formatted_pace = f"{pminutes}:{pseconds:02d} /km"
         return formatted_value, formatted_pace
 
+    if typeId == 5:  # 21K
+        # Round to the nearest second
+        total_seconds = round(value)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        if hours > 0:
+            formatted_value = f"{hours}:{minutes:02d}:{seconds:02d}"
+        else:
+            formatted_value = f"{minutes}:{seconds:02d}"
+        total_pseconds = total_seconds // 21  # Divide by 21km -> ISSUE : how to divide with a non integer ???
+        phours = total_pseconds // 3600
+        pminutes = (total_pseconds % 3600) // 60
+        pseconds = total_pseconds % 60
+        formatted_pace = f"{pminutes}:{pseconds:02d} /km"
+        return formatted_value, formatted_pace
+
+    if typeId == 4:  # 42K
+        # Round to the nearest second
+        total_seconds = round(value)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        if hours > 0:
+            formatted_value = f"{hours}:{minutes:02d}:{seconds:02d}"
+        else:
+            formatted_value = f"{minutes}:{seconds:02d}"
+        total_pseconds = total_seconds // 42  # Divide by 42km
+        phours = total_pseconds // 3600
+        pminutes = (total_pseconds % 3600) // 60
+        pseconds = total_pseconds % 60
+        formatted_pace = f"{pminutes}:{pseconds:02d} /km"
+        return formatted_value, formatted_pace
+    
     if typeId in [7, 8]:  # Longest Run, Longest Ride
         value_km = value / 1000
         formatted_value = f"{value_km:.2f} km"
@@ -113,6 +154,23 @@ def format_garmin_value(value, activity_type, typeId):
         pace = ""
         return formatted_value, pace
 
+    if typeId == 11:  # 40K
+        # Round to the nearest second
+        total_seconds = round(value)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        if hours > 0:
+            formatted_value = f"{hours}:{minutes:02d}:{seconds:02d}"
+        else:
+            formatted_value = f"{minutes}:{seconds:02d}"
+        total_pseconds = total_seconds // 42  # Divide by 42km
+        phours = total_pseconds // 3600
+        pminutes = (total_pseconds % 3600) // 60
+        pseconds = total_pseconds % 60
+        formatted_pace = f"{pminutes}:{pseconds:02d} /km"
+        return formatted_value, formatted_pace
+    
     if typeId in [12, 13, 14]:  # Step counts
         value_steps = round(value)
         formatted_value = f"{value_steps:,}"
@@ -145,10 +203,13 @@ def replace_activity_name_by_typeId(typeId):
         2: "1mi",
         3: "5K",
         4: "10K",
+        5: "Half marathon",
+        6: "Marathon",
         7: "Longest Run",
         8: "Longest Ride",
         9: "Total Ascent",
         10: "Max Avg Power (20 min)",
+        11: "40K",
         12: "Most Steps in a Day",
         13: "Most Steps in a Week",
         14: "Most Steps in a Month",
