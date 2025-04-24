@@ -10,7 +10,7 @@ def get_all_daily_steps(garmin):
     """
     startdate = date.today() - timedelta(days=3000)
     daterange = [startdate + timedelta(days=x) 
-                 for x in range((date.today() - startdate).days) - 1] # incl. today
+                 for x in range((date.today() - startdate).days)]-1 # incl. today
     daily_steps = []
     for d in daterange:
         daily_steps += garmin.get_daily_steps(d.isoformat(), d.isoformat())
