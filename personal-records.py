@@ -262,15 +262,29 @@ def main():
             update_record(client, existing_date_record['id'], activity_date, value, pace, activity_name, True)
             print(f"Updated existing record: {activity_type} - {activity_name}")
         elif existing_pr_record:
-            existing_date = existing_pr_record['properties']['Date']['date']['start']
-            if activity_date > existing_date:
-                update_record(client, existing_pr_record['id'], existing_date, None, None, activity_name, False)
-                print(f"Archived old record: {activity_type} - {activity_name}")
-                
+            # Add error handling here
+            try:
+                date_prop = existing_pr_record['properties']['Date']
+                if date_prop and date_prop.get('date') and date_prop['date'].get('start'):
+                    existing_date = date_prop['date']['start']
+                    
+                    if activity_date > existing_date:
+                        update_record(client, existing_pr_record['id'], existing_date, None, None, activity_name, False)
+                        print(f"Archived old record: {activity_type} - {activity_name}")
+                        
+                        write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
+                        print(f"Created new PR record: {activity_type} - {activity_name}")
+                    else:
+                        print(f"No update needed: {activity_type} - {activity_name}")
+                else:
+                    # Handle case where date is missing or improperly formatted
+                    print(f"Warning: Record {activity_name} has invalid date format - updating anyway")
+                    update_record(client, existing_pr_record['id'], activity_date, value, pace, activity_name, True)
+            except (KeyError, TypeError) as e:
+                print(f"Error processing record {activity_name}: {e}")
+                print(f"Record data: {existing_pr_record['properties']}")
+                # Fallback - create new record if we can't process the existing one properly
                 write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
-                print(f"Created new PR record: {activity_type} - {activity_name}")
-            else:
-                print(f"No update needed: {activity_type} - {activity_name}")
         else:
             write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace)
             print(f"Successfully written new record: {activity_type} - {activity_name}")
