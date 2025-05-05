@@ -252,18 +252,48 @@ def update_activity(client, existing_activity, new_activity):
         
     client.pages.update(**update)
 
+def init_garmin_client():
+    """
+    Initialize Garmin client with 2FA support
+    """
+    garmin_email = os.getenv("GARMIN_EMAIL")
+    garmin_password = os.getenv("GARMIN_PASSWORD")
+    token_store = os.getenv("GARMIN_TOKEN_STORE", "~/.garmin_tokens")
+    token_store = os.path.expanduser(token_store)
+    
+    # Initialize Garmin client
+    garmin = Garmin(garmin_email, garmin_password)
+    
+    try:
+        # Try to use stored tokens first
+        if os.path.exists(token_store):
+            print(f"Using stored tokens from {token_store}")
+            garmin.login(tokenstore=token_store)
+        else:
+            # Fall back to regular login
+            print("No stored tokens found, performing regular login")
+            garmin.login()
+            
+            # Save tokens if login successful
+            if hasattr(garmin, 'garth') and garmin.garth:
+                os.makedirs(os.path.dirname(token_store), exist_ok=True)
+                garmin.garth.save(token_store)
+                print(f"Saved authentication tokens to {token_store}")
+        
+        return garmin
+    except Exception as e:
+        print(f"Error during Garmin login: {e}")
+        raise
+
 def main():
     load_dotenv()
 
     # Initialize Garmin and Notion clients using environment variables
-    garmin_email = os.getenv("GARMIN_EMAIL")
-    garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
 
-    # Initialize Garmin client and login
-    garmin = Garmin(garmin_email, garmin_password)
-    garmin.login()
+    # Initialize Garmin client with 2FA support
+    garmin = init_garmin_client()
     client = Client(auth=notion_token)
     
     # Get all activities

@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 env:
   TZ: 'America/Montreal'
+  GARMIN_TOKEN_DIR: '/home/runner/.garth'
 
 jobs:
   sync:

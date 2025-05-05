@@ -3,6 +3,7 @@ from garminconnect import Garmin
 from notion_client import Client
 from dotenv import load_dotenv
 import os
+import sys
 
 def get_all_daily_steps(garmin):
     """
@@ -89,20 +90,65 @@ def create_daily_steps(client, database_id, steps):
     
     client.pages.create(**page)
 
+def login_to_garmin():
+    """
+    Login to Garmin Connect with 2FA support
+    """
+    garmin_email = os.getenv("GARMIN_EMAIL")
+    garmin_password = os.getenv("GARMIN_PASSWORD")
+    token_store = os.getenv("GARMIN_TOKEN_STORE", "~/.garmin_tokens")
+    token_store = os.path.expanduser(token_store)
+    mfa_code = os.getenv("GARMIN_MFA_CODE")  # Optional, for non-interactive 2FA
+    
+    # Initialize Garmin client
+    garmin = Garmin(garmin_email, garmin_password)
+    
+    try:
+        # First try to use token store if it exists
+        if os.path.exists(token_store):
+            print(f"Using stored tokens from {token_store}")
+            garmin.login(tokenstore=token_store)
+            return garmin
+        
+        # If no token store or it failed, try fresh login
+        if mfa_code:
+            # Use non-interactive 2FA flow
+            print("Using non-interactive 2FA flow")
+            client_state, _ = garmin.login(return_on_mfa=True)
+            if client_state == "needs_mfa":
+                garmin.resume_login(client_state, mfa_code)
+            else:
+                print("MFA was expected but not requested")
+        else:
+            # Use interactive login (will prompt for MFA code if needed)
+            garmin.login()
+        
+        # Save tokens for future use if login was successful
+        if hasattr(garmin, 'garth') and garmin.garth:
+            # Make sure token store directory exists
+            os.makedirs(os.path.dirname(token_store), exist_ok=True)
+            garmin.garth.save(token_store)
+            print(f"Saved authentication tokens to {token_store}")
+        
+        return garmin
+    except Exception as e:
+        print(f"Error during Garmin login: {e}")
+        sys.exit(1)
+
 def main():
     load_dotenv()
 
-    # Initialize Garmin and Notion clients using environment variables
-    garmin_email = os.getenv("GARMIN_EMAIL")
-    garmin_password = os.getenv("GARMIN_PASSWORD")
+    # Get environment variables
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_STEPS_DB_ID")
 
-    # Initialize Garmin client and login
-    garmin = Garmin(garmin_email, garmin_password)
-    garmin.login()
+    # Login to Garmin with 2FA support
+    garmin = login_to_garmin()
+    
+    # Initialize Notion client
     client = Client(auth=notion_token)
 
+    # Get and process daily steps
     daily_steps = get_all_daily_steps(garmin)
     for steps in daily_steps:
         steps_date = steps.get('calendarDate')
@@ -110,8 +156,10 @@ def main():
         if existing_steps:
             if steps_need_update(existing_steps, steps):
                 update_daily_steps(client, existing_steps, steps)
+                print(f"Updated steps for {steps_date}")
         else:
             create_daily_steps(client, database_id, steps)
+            print(f"Created new steps entry for {steps_date}")
 
 if __name__ == '__main__':
     main()
