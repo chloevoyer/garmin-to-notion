@@ -4,5 +4,5 @@ pytz==2024.1
 datetime==5.5
 withings-sync==4.2.4
 lxml>=4.6.0,<5.0
-
+garth>=0.5.13,<0.6.0
 
