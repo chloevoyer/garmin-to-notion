@@ -30,7 +30,7 @@ ACTIVITY_ICONS = {
     # Add more mappings as needed
 }
 
-def get_all_activities(garmin, limit=1000):
+def garmin.get_activities(start, limit)(garmin, limit=1000):
     return garmin.get_activities(0, limit)
 
 
@@ -294,7 +294,7 @@ def main():
     client = Client(auth=notion_token)
     
     # Get all activities and filter duplicates
-    activities = deduplicate_activities(get_all_activities(garmin))
+    activities = deduplicate_activities(garmin.get_activities(start, limit)(garmin))
 
     # Process all activities
     for activity in activities:
