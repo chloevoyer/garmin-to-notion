@@ -33,6 +33,30 @@ ACTIVITY_ICONS = {
 def get_all_activities(garmin, limit=1000):
     return garmin.get_activities(0, limit)
 
+
+def deduplicate_activities(activities):
+    """Remove duplicate activities based on time, type and duration."""
+    seen = set()
+    unique = []
+    for act in activities:
+        key = (
+            act.get('startTimeGMT'),
+            round(act.get('duration', 0)),
+            act.get('activityType', {}).get('typeKey'),
+            round(act.get('distance', 0))
+        )
+        if key not in seen:
+            seen.add(key)
+            unique.append(act)
+    return unique
+
+
+def should_skip_activity(activity, skip_types, skip_sources):
+    """Determine if an activity should be skipped based on type or source."""
+    activity_type = activity.get('activityType', {}).get('typeKey', '')
+    source = activity.get('sourceType', '') or activity.get('deviceName', '')
+    return activity_type in skip_types or source in skip_sources
+
 def format_activity_type(activity_type, activity_name=""):
     # First format the activity type as before
     formatted_type = activity_type.replace('_', ' ').title() if activity_type else "Unknown"
@@ -261,16 +285,21 @@ def main():
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
 
+    skip_types = [s.strip() for s in os.getenv("SKIP_ACTIVITY_TYPES", "").split(',') if s.strip()]
+    skip_sources = [s.strip() for s in os.getenv("SKIP_ACTIVITY_SOURCES", "").split(',') if s.strip()]
+
     # Initialize Garmin client and login
     garmin = Garmin(garmin_email, garmin_password)
     garmin.login()
     client = Client(auth=notion_token)
     
-    # Get all activities
-    activities = get_all_activities(garmin)
+    # Get all activities and filter duplicates
+    activities = deduplicate_activities(get_all_activities(garmin))
 
     # Process all activities
     for activity in activities:
+        if should_skip_activity(activity, skip_types, skip_sources):
+            continue
         activity_date = activity.get('startTimeGMT')
         activity_name = format_entertainment(activity.get('activityName', 'Unnamed Activity'))
         activity_type, activity_subtype = format_activity_type(

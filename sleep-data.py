@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from garminconnect import Garmin
 from notion_client import Client
-from dotenv import load_dotenv, dotenv_values
+from dotenv import load_dotenv
 import pytz
 import os
 
@@ -10,11 +10,17 @@ local_tz = pytz.timezone("America/New_York")
 
 # Load environment variables
 load_dotenv()
-CONFIG = dotenv_values()
 
-def get_sleep_data(garmin):
-    today = datetime.today().date()
-    return garmin.get_sleep_data(today.isoformat())
+def get_sleep_data(garmin, day):
+    """Fetch sleep data for a single day."""
+    return garmin.get_sleep_data(day.isoformat())
+
+
+def get_sleep_range(garmin, days):
+    """Yield sleep data for a range of days ending today."""
+    for i in range(days):
+        target_day = datetime.today().date() - timedelta(days=i)
+        yield target_day, get_sleep_data(garmin, target_day)
 
 def format_duration(seconds):
     minutes = (seconds or 0) // 60
@@ -75,6 +81,13 @@ def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
         "Awake Time": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('awakeSleepSeconds', 0))}}]},
         "Resting HR": {"number": sleep_data.get('restingHeartRate', 0)}
     }
+
+    sleep_score = (
+        sleep_data.get('overallScore')
+        or sleep_data.get('sleepScores', {}).get('overallScore')
+    )
+    if sleep_score is not None:
+        properties["Sleep Score"] = {"number": sleep_score}
     
     client.pages.create(parent={"database_id": database_id}, properties=properties, icon={"emoji": "😴"})
     print(f"Created sleep entry for: {sleep_date}")
@@ -93,8 +106,10 @@ def main():
     garmin.login()
     client = Client(auth=notion_token)
 
-    data = get_sleep_data(garmin)
-    if data:
+    days = int(os.getenv("SLEEP_DAYS", "1"))
+    for day, data in get_sleep_range(garmin, days):
+        if not data:
+            continue
         sleep_date = data.get('dailySleepDTO', {}).get('calendarDate')
         if sleep_date and not sleep_data_exists(client, database_id, sleep_date):
             create_sleep_data(client, database_id, data, skip_zero_sleep=True)
