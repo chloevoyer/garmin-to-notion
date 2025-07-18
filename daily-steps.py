@@ -39,11 +39,22 @@ def steps_need_update(existing_steps, new_steps):
     existing_props = existing_steps['properties']
     activity_type = "Walking"
     
+    total_distance = new_steps.get('totalDistance')
+    if total_distance is None:
+        total_distance = 0
+    expected_distance = round(total_distance / 1000, 2)
+
+    existing_title = ""
+    if existing_props.get('Activity Type', {}).get('title'):
+        title_prop = existing_props['Activity Type']['title']
+        if isinstance(title_prop, list) and title_prop:
+            existing_title = title_prop[0].get('plain_text', '')
+
     return (
         existing_props['Total Steps']['number'] != new_steps.get('totalSteps') or
         existing_props['Step Goal']['number'] != new_steps.get('stepGoal') or
-        existing_props['Total Distance (km)']['number'] != new_steps.get('totalDistance') or
-        existing_props['Activity Type']['title'] != activity_type
+        existing_props['Total Distance (km)']['number'] != expected_distance or
+        existing_title != activity_type
     )
 
 def update_daily_steps(client, existing_steps, new_steps):
