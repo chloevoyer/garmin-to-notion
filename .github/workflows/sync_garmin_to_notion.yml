@@ -46,6 +46,8 @@ jobs:
           NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
           TZ: 'America/Montreal'
         run: |
+          python garmin-store-token.py
+          python garmin-2fa-login.py
           python garmin-activities.py
           python personal-records.py
           python daily-steps.py
