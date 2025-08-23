@@ -1,0 +1,55 @@
+
+name: Garmin → Notion (every 15 min)
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Restore Garmin token cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~/.garmin_tokens
+          key: garmin-tokens
+          restore-keys: |
+            garmin-tokens-
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run sync
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_PARENT_PAGE_ID: ${{ secrets.NOTION_PARENT_PAGE_ID }}
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          GARMIN_TOKEN_STORE: ${{ secrets.GARMIN_TOKEN_STORE }}
+          GARMIN_MFA_CODE: ${{ secrets.GARMIN_MFA_CODE }}
+        run: |
+          python garmin_notion_daily.py
+
+      - name: Save Garmin token cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.garmin_tokens
+          key: garmin-tokens-${{ github.run_id }}

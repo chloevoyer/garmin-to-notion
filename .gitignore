@@ -1,1 +1,31 @@
+# Ignore environment variable files & tokens
 .env
+*.env
+.env.*
+.envrc
+.env.local
+.env.production
+.env.development.local
+.env.development
+.env.test.local
+.env.production.local
+garmin_tokens/
+garmin_tokens/**
+
+# VSCode settings (optional but often useful)
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local token store (make sure this matches GARMIN_TOKEN_STORE)
+.garmin_tokens
+.garmin_tokens/*
+.garth/
+.garth/*
+
+# IDE
+.idea/
