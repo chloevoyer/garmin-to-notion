@@ -6,9 +6,9 @@ from notion_client import Client
 @dataclass(frozen=True)
 class NotionDatabases:
     activities: str
-    pull_requests: str
+    personal_records: str
     sleep: str
-    steps: str
+    daily_steps: str
 
 
 def get_notion_client() -> tuple[Client, NotionDatabases]:
@@ -16,9 +16,9 @@ def get_notion_client() -> tuple[Client, NotionDatabases]:
 
     notion_databases = NotionDatabases(
         activities=os.getenv("NOTION_DB_ID"),
-        pull_requests=os.getenv("NOTION_PR_DB_ID"),
+        personal_records=os.getenv("NOTION_PR_DB_ID"),
         sleep=os.getenv("NOTION_SLEEP_DB_ID"),
-        steps=os.getenv("NOTION_STEPS_DB_ID"),
+        daily_steps=os.getenv("NOTION_STEPS_DB_ID"),
     )
 
     notion_token = os.getenv("NOTION_TOKEN")
