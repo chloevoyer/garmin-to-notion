@@ -3,8 +3,7 @@ from datetime import datetime
 import pytz
 from dotenv import load_dotenv, dotenv_values
 
-from get_garmin_client import get_garmin_client
-from get_notion_client import get_notion_client
+from src.helpers import get_garmin_client, get_notion_client
 
 # Constants
 local_tz = pytz.timezone("America/New_York")

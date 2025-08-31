@@ -2,8 +2,7 @@ from typing import Any
 
 from dotenv import load_dotenv
 
-from get_garmin_client import get_garmin_client
-from get_notion_client import get_notion_client
+from src.helpers import get_garmin_client, get_notion_client
 
 
 def get_icon_for_record(activity_name):

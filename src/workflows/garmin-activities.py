@@ -1,8 +1,7 @@
 import pytz
 from dotenv import load_dotenv
 
-from get_garmin_client import get_garmin_client
-from get_notion_client import get_notion_client
+from src.helpers import get_garmin_client, get_notion_client
 
 # Your local time zone, replace with the appropriate one if needed
 local_tz = pytz.timezone('America/Toronto')
