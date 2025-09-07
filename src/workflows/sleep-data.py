@@ -6,7 +6,7 @@ from dotenv import load_dotenv, dotenv_values
 from src.helpers import get_garmin_client, get_notion_client
 
 # Constants
-local_tz = pytz.timezone("America/New_York")
+local_tz = pytz.timezone("Europe/Stockholm")
 
 # Load environment variables
 load_dotenv()
