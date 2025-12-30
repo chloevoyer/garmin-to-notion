@@ -4,6 +4,8 @@ from notion_client import Client
 from dotenv import load_dotenv
 import os
 
+MILES_PER_METER = 0.00621371
+
 def get_all_daily_steps(garmin):
     """
     Get last x days of daily step count data from Garmin Connect.
@@ -57,7 +59,7 @@ def update_daily_steps(client, existing_steps, new_steps):
         "Activity Type":  {"title": [{"text": {"content": "Walking"}}]},
         "Total Steps": {"number": new_steps.get('totalSteps')},
         "Step Goal": {"number": new_steps.get('stepGoal')},
-        "Total Distance (km)": {"number": round(total_distance / 1000, 2)}
+        "Total Distance (km)": {"number": round(total_distance * MILES_PER_METER, 2)}
     }
     
     update = {
@@ -79,7 +81,7 @@ def create_daily_steps(client, database_id, steps):
         "Date": {"date": {"start": steps.get('calendarDate')}},
         "Total Steps": {"number": steps.get('totalSteps')},
         "Step Goal": {"number": steps.get('stepGoal')},
-        "Total Distance (km)": {"number": round(total_distance / 1000, 2)}
+        "Total Distance (km)": {"number": round(total_distance * MILES_PER_METER, 2)}
     }
     
     page = {

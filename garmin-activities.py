@@ -30,6 +30,8 @@ ACTIVITY_ICONS = {
     # Add more mappings as needed
 }
 
+MILES_PER_METER = 0.00621371
+
 def get_all_activities(garmin, limit=1000):
     return garmin.get_activities(0, limit)
 
@@ -151,7 +153,7 @@ def activity_needs_update(existing_activity, new_activity):
     )
     
     return (
-        existing_props['Distance (km)']['number'] != round(new_activity.get('distance', 0) / 1000, 2) or
+        existing_props['Distance (km)']['number'] != round(new_activity.get('distance', 0) * MILES_PER_METER, 2) or
         existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
         existing_props['Calories']['number'] != round(new_activity.get('calories', 0)) or
         existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
@@ -187,7 +189,7 @@ def create_activity(client, database_id, activity):
         "Activity Type": {"select": {"name": activity_type}},
         "Subactivity Type": {"select": {"name": activity_subtype}},
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-        "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
+        "Distance (km)": {"number": round(activity.get('distance', 0) * MILES_PER_METER, 2)},
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
@@ -227,7 +229,7 @@ def update_activity(client, existing_activity, new_activity):
     properties = {
         "Activity Type": {"select": {"name": activity_type}},
         "Subactivity Type": {"select": {"name": activity_subtype}},
-        "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
+        "Distance (km)": {"number": round(new_activity.get('distance', 0) * MILES_PER_METER, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(new_activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
@@ -260,6 +262,7 @@ def main():
     garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
+    print(garmin_email, garmin_password, notion_token, database_id)
 
     # Initialize Garmin client and login
     garmin = Garmin(garmin_email, garmin_password)
@@ -278,6 +281,10 @@ def main():
             activity_name
         )
         
+        print("Activity:\n")
+        print(activity)
+        print("/n/n")
+
         # Check if activity already exists in Notion
         existing_activity = activity_exists(client, database_id, activity_date, activity_type, activity_name)
         
