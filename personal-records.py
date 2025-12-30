@@ -3,6 +3,8 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
+MILES_PER_METER = 0.000621371
+
 def get_icon_for_record(activity_name):
     icon_map = {
         "1K": "🥇",
@@ -96,8 +98,8 @@ def format_garmin_value(value, activity_type, typeId):
         return formatted_value, formatted_pace
 
     if typeId in [7, 8]:  # Longest Run, Longest Ride
-        value_km = value / 1000
-        formatted_value = f"{value_km:.2f} km"
+        value_mi = value * MILES_PER_METER
+        formatted_value = f"{value_mi:.2f} mi"
         pace = ""  # No pace for these types
         return formatted_value, pace
 
