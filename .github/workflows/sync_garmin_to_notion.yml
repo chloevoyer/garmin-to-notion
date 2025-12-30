@@ -48,4 +48,3 @@ jobs:
           python garmin-activities.py
           python personal-records.py
           python daily-steps.py
-          python sleep-data.py
