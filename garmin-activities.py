@@ -153,7 +153,7 @@ def activity_needs_update(existing_activity, new_activity):
     )
     
     return (
-        existing_props['Distance (mi)']['number'] != round(new_activity.get('distance', 0) * MILES_PER_METER, 2) or
+        existing_props['Distance (mi)']['number'] != ('{:.2f}'.format(new_activity.get('distance', 0) * MILES_PER_METER, 2)) or
         existing_props['Duration (min)']['number'] != round(new_activity.get('duration', 0) / 60, 2) or
         existing_props['Calories']['number'] != round(new_activity.get('calories', 0)) or
         existing_props['Avg Pace']['rich_text'][0]['text']['content'] != format_pace(new_activity.get('averageSpeed', 0)) or
@@ -189,7 +189,7 @@ def create_activity(client, database_id, activity):
         "Activity Type": {"select": {"name": activity_type}},
         "Subactivity Type": {"select": {"name": activity_subtype}},
         "Activity Name": {"title": [{"text": {"content": activity_name}}]},
-        "Distance (mi)": {"number": round(activity.get('distance', 0) * MILES_PER_METER, 2)},
+        "Distance (mi)": {"number": '{:.2f}'.format(activity.get('distance', 0) * MILES_PER_METER, 2)},
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
@@ -229,7 +229,7 @@ def update_activity(client, existing_activity, new_activity):
     properties = {
         "Activity Type": {"select": {"name": activity_type}},
         "Subactivity Type": {"select": {"name": activity_subtype}},
-        "Distance (mi)": {"number": round(new_activity.get('distance', 0) * MILES_PER_METER, 2)},
+        "Distance (mi)": {"number": '{:.2f}'.format(new_activity.get('distance', 0) * MILES_PER_METER, 2)},
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(new_activity.get('calories', 0))},
         "Avg Pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},

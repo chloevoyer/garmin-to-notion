@@ -59,7 +59,7 @@ def update_daily_steps(client, existing_steps, new_steps):
         "Activity Type":  {"title": [{"text": {"content": "Walking"}}]},
         "Total Steps": {"number": new_steps.get('totalSteps')},
         "Step Goal": {"number": new_steps.get('stepGoal')},
-        "Total Distance (mi)": {"number": round(total_distance * MILES_PER_METER, 2)}
+        "Total Distance (mi)": {"number": '{:.2f}'.format(total_distance * MILES_PER_METER, 2)}
     }
     
     update = {
@@ -81,7 +81,7 @@ def create_daily_steps(client, database_id, steps):
         "Date": {"date": {"start": steps.get('calendarDate')}},
         "Total Steps": {"number": steps.get('totalSteps')},
         "Step Goal": {"number": steps.get('stepGoal')},
-        "Total Distance (mi)": {"number": round(total_distance * MILES_PER_METER, 2)}
+        "Total Distance (mi)": {"number": '{:.2f}'.format(total_distance * MILES_PER_METER, 2)}
     }
     
     page = {
