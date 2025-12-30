@@ -262,7 +262,6 @@ def main():
     garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
-    print(garmin_email, garmin_password, notion_token, database_id)
 
     # Initialize Garmin client and login
     garmin = Garmin(garmin_email, garmin_password)
@@ -280,10 +279,6 @@ def main():
             activity.get('activityType', {}).get('typeKey', 'Unknown'),
             activity_name
         )
-        
-        print("Activity:\n")
-        print(activity)
-        print("/n/n")
 
         # Check if activity already exists in Notion
         existing_activity = activity_exists(client, database_id, activity_date, activity_type, activity_name)
