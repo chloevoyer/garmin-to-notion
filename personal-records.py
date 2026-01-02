@@ -240,7 +240,7 @@ def main():
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_PR_DB_ID")
 
-    garmin = Garmin(garmin_email, garmin_password)
+    garmin = Garmin(garmin_email, garmin_password, is_cn=True)
     garmin.login()
 
     client = Client(auth=notion_token)
