@@ -89,7 +89,7 @@ def main():
     database_id = os.getenv("NOTION_SLEEP_DB_ID")
 
     # Initialize Garmin client and login
-    garmin = Garmin(garmin_email, garmin_password)
+    garmin = Garmin(garmin_email, garmin_password, is_cn=True)
     garmin.login()
     client = Client(auth=notion_token)
 
