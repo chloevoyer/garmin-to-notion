@@ -24,8 +24,8 @@ def daily_steps_exist(client, database_id, activity_date):
         database_id=database_id,
         filter={
             "and": [
-                {"property": "Date", "date": {"equals": activity_date}},
-                {"property": "Activity Type", "title": {"equals": "Walking"}}
+                {"property": "日期", "date": {"equals": activity_date}},
+                {"property": "运动类型", "title": {"equals": "Walking"}}
             ]
         }
     )
@@ -40,10 +40,10 @@ def steps_need_update(existing_steps, new_steps):
     activity_type = "Walking"
     
     return (
-        existing_props['Total Steps']['number'] != new_steps.get('totalSteps') or
-        existing_props['Step Goal']['number'] != new_steps.get('stepGoal') or
-        existing_props['Total Distance (km)']['number'] != new_steps.get('totalDistance') or
-        existing_props['Activity Type']['title'] != activity_type
+        existing_props['总步数']['number'] != new_steps.get('totalSteps') or
+        existing_props['步数目标']['number'] != new_steps.get('stepGoal') or
+        existing_props['总距离 (km)']['number'] != new_steps.get('totalDistance') or
+        existing_props['运动类型']['title'][0]['text']['content'] != activity_type
     )
 
 def update_daily_steps(client, existing_steps, new_steps):
@@ -54,10 +54,10 @@ def update_daily_steps(client, existing_steps, new_steps):
     if total_distance is None:
         total_distance = 0
     properties = {
-        "Activity Type":  {"title": [{"text": {"content": "Walking"}}]},
-        "Total Steps": {"number": new_steps.get('totalSteps')},
-        "Step Goal": {"number": new_steps.get('stepGoal')},
-        "Total Distance (km)": {"number": round(total_distance / 1000, 2)}
+        "运动类型":  {"title": [{"text": {"content": "Walking"}}]},
+        "总步数": {"number": new_steps.get('totalSteps')},
+        "步数目标": {"number": new_steps.get('stepGoal')},
+        "总距离 (km)": {"number": round(total_distance / 1000, 2)}
     }
     
     update = {
@@ -75,11 +75,11 @@ def create_daily_steps(client, database_id, steps):
     if total_distance is None:
         total_distance = 0
     properties = {
-        "Activity Type": {"title": [{"text": {"content": "Walking"}}]},
-        "Date": {"date": {"start": steps.get('calendarDate')}},
-        "Total Steps": {"number": steps.get('totalSteps')},
-        "Step Goal": {"number": steps.get('stepGoal')},
-        "Total Distance (km)": {"number": round(total_distance / 1000, 2)}
+        "运动类型": {"title": [{"text": {"content": "Walking"}}]},
+        "日期": {"date": {"start": steps.get('calendarDate')}},
+        "总步数": {"number": steps.get('totalSteps')},
+        "步数目标": {"number": steps.get('stepGoal')},
+        "总距离 (km)": {"number": round(total_distance / 1000, 2)}
     }
     
     page = {
