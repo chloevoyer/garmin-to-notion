@@ -133,23 +133,19 @@ def format_pace(average_speed):
         return ""
     
 def activity_exists(client, database_id, activity_date, activity_type, activity_name):
-    # Check if an activity already exists in the Notion database and return it if found.
-
-    # Handle the activity_type which is now a tuple
     if isinstance(activity_type, tuple):
         main_type, _ = activity_type
     else:
         main_type = activity_type[0] if isinstance(activity_type, (list, tuple)) else activity_type
     
-    # Determine the correct activity type for the lookup
     lookup_type = "Stretching" if "stretch" in activity_name.lower() else main_type
     
-    # [修改] 使用中文属性名进行查询，并把类型翻译成中文
+    # [修复] 这里的 property 必须是 "日期"、"运动类型"、"运动名称"
     query = client.databases.query(
         database_id=database_id,
         filter={
             "and": [
-                {"property": "日期", "date": {"equals": activity_date.split('T')[0]}},
+                {"property": "日期", "date": {"equals": activity_date.split('T')[0]}}, 
                 {"property": "运动类型", "select": {"equals": translate_type(lookup_type)}},
                 {"property": "运动名称", "title": {"equals": activity_name}}
             ]
