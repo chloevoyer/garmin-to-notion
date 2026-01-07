@@ -1,0 +1,36 @@
+name: Manual History Backfill (手动回填历史)
+
+on:
+  workflow_dispatch: # 这个意思是：只有你手动点按钮，它才会跑
+
+env:
+  TZ: 'Asia/Shanghai'
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+
+      - name: Run Backfill Script
+        env:
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          # 引用你的 CN 数据库 ID
+          NOTION_CN_DB_ID: ${{ secrets.NOTION_CN_DB_ID }}
+          NOTION_CN_PR_DB_ID: ${{ secrets.NOTION_CN_PR_DB_ID }}
+          NOTION_CN_STEPS_DB_ID: ${{ secrets.NOTION_CN_STEPS_DB_ID }}
+          NOTION_CN_SLEEP_DB_ID: ${{ secrets.NOTION_CN_SLEEP_DB_ID }}
+        run: |
+          python run_once_backfill.py
