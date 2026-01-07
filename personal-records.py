@@ -3,6 +3,24 @@ from garminconnect import Garmin
 from notion_client import Client
 import os
 
+TYPE_TRANSLATION = {
+    "Running": "跑步",
+    "Cycling": "骑行",
+    "Walking": "徒步",
+    "Swimming": "游泳",
+    "Strength": "力量训练",
+    "Cardio": "有氧运动",
+    "Hiking": "登山",
+    "Indoor Cycling": "室内骑行",
+    "Indoor Rowing": "室内划船",
+    "Rowing": "划船",
+    "Unknown": "未知"
+}
+
+def translate_type(english_type):
+    if english_type is None: return "未知"
+    return TYPE_TRANSLATION.get(english_type, english_type)
+    
 def get_icon_for_record(activity_name):
     icon_map = {
         "1K": "🥇",
@@ -39,9 +57,10 @@ def get_cover_for_record(activity_name):
 
 def format_activity_type(activity_type):
     if activity_type is None:
-        return "Walking"
-    return activity_type.replace('_', ' ').title()
-
+        return "徒步"
+    formatted = activity_type.replace('_', ' ').title()
+    return translate_type(formatted)
+    
 def format_activity_name(activity_name):
     if not activity_name or activity_name is None:
         return "Unnamed Activity"
@@ -161,7 +180,7 @@ def get_existing_record(client, database_id, activity_name):
         database_id=database_id,
         filter={
             "and": [
-                {"property": "Record", "title": {"equals": activity_name}},
+                {"property": "纪录名称", "title": {"equals": activity_name}},
                 {"property": "PR", "checkbox": {"equals": True}}
             ]
         }
@@ -173,8 +192,8 @@ def get_record_by_date_and_name(client, database_id, activity_date, activity_nam
         database_id=database_id,
         filter={
             "and": [
-                {"property": "Record", "title": {"equals": activity_name}},
-                {"property": "Date", "date": {"equals": activity_date}}
+                {"property": "纪录名称", "title": {"equals": activity_name}},
+                {"property": "日期", "date": {"equals": activity_date}}
             ]
         }
     )
@@ -182,15 +201,15 @@ def get_record_by_date_and_name(client, database_id, activity_date, activity_nam
 
 def update_record(client, page_id, activity_date, value, pace, activity_name, is_pr=True):
     properties = {
-        "Date": {"date": {"start": activity_date}},
+        "日期": {"date": {"start": activity_date}},
         "PR": {"checkbox": is_pr}
     }
     
     if value:
-        properties["Value"] = {"rich_text": [{"text": {"content": value}}]}
+        properties["数值"] = {"rich_text": [{"text": {"content": value}}]}
     
     if pace:
-        properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
+        properties["配速"] = {"rich_text": [{"text": {"content": pace}}]}
 
     icon = get_icon_for_record(activity_name)
     cover = get_cover_for_record(activity_name)
@@ -208,18 +227,18 @@ def update_record(client, page_id, activity_date, value, pace, activity_name, is
 
 def write_new_record(client, database_id, activity_date, activity_type, activity_name, typeId, value, pace):
     properties = {
-        "Date": {"date": {"start": activity_date}},
-        "Activity Type": {"select": {"name": activity_type}},
-        "Record": {"title": [{"text": {"content": activity_name}}]},
-        "typeId": {"number": typeId},
+        "日期": {"date": {"start": activity_date}},
+        "运动类型": {"select": {"name": activity_type}},
+        "纪录名称": {"title": [{"text": {"content": activity_name}}]},
+        "类型ID": {"number": typeId},
         "PR": {"checkbox": True}
     }
     
     if value:
-        properties["Value"] = {"rich_text": [{"text": {"content": value}}]}
+        properties["数值"] = {"rich_text": [{"text": {"content": value}}]}
     
     if pace:
-        properties["Pace"] = {"rich_text": [{"text": {"content": pace}}]}
+        properties["配速"] = {"rich_text": [{"text": {"content": pace}}]}
     
     icon = get_icon_for_record(activity_name)
     cover = get_cover_for_record(activity_name)
@@ -264,9 +283,9 @@ def main():
         elif existing_pr_record:
             # Add error handling here
             try:
-                date_prop = existing_pr_record['properties']['Date']
-                if date_prop and date_prop.get('date') and date_prop['date'].get('start'):
-                    existing_date = date_prop['date']['start']
+                date_prop = existing_pr_record['properties']['日期'] 
+                if date_prop and date_prop.get('date') and date_prop['date'].get('start'): 
+                    existing_date = date_prop['date']['start'] 
                     
                     if activity_date > existing_date:
                         update_record(client, existing_pr_record['id'], existing_date, None, None, activity_name, False)
