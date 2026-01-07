@@ -38,11 +38,11 @@ def format_date_for_name(sleep_date):
 def sleep_data_exists(client, database_id, sleep_date):
     query = client.databases.query(
         database_id=database_id,
-        filter={"property": "Long Date", "date": {"equals": sleep_date}}
+        filter={"property": "长日期", "date": {"equals": sleep_date}}
     )
     results = query.get('results', [])
     return results[0] if results else None  # Ensure it returns None instead of causing IndexError
-
+    
 def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
     daily_sleep = sleep_data.get('dailySleepDTO', {})
     if not daily_sleep:
@@ -59,21 +59,21 @@ def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
         return
 
     properties = {
-        "Date": {"title": [{"text": {"content": format_date_for_name(sleep_date)}}]},
-        "Times": {"rich_text": [{"text": {"content": f"{format_time_readable(daily_sleep.get('sleepStartTimestampGMT'))} → {format_time_readable(daily_sleep.get('sleepEndTimestampGMT'))}"}}]},
-        "Long Date": {"date": {"start": sleep_date}},
-        "Full Date/Time": {"date": {"start": format_time(daily_sleep.get('sleepStartTimestampGMT')), "end": format_time(daily_sleep.get('sleepEndTimestampGMT'))}},
-        "Total Sleep (h)": {"number": round(total_sleep / 3600, 1)},
-        "Light Sleep (h)": {"number": round(daily_sleep.get('lightSleepSeconds', 0) / 3600, 1)},
-        "Deep Sleep (h)": {"number": round(daily_sleep.get('deepSleepSeconds', 0) / 3600, 1)},
-        "REM Sleep (h)": {"number": round(daily_sleep.get('remSleepSeconds', 0) / 3600, 1)},
-        "Awake Time (h)": {"number": round(daily_sleep.get('awakeSleepSeconds', 0) / 3600, 1)},
-        "Total Sleep": {"rich_text": [{"text": {"content": format_duration(total_sleep)}}]},
-        "Light Sleep": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('lightSleepSeconds', 0))}}]},
-        "Deep Sleep": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('deepSleepSeconds', 0))}}]},
-        "REM Sleep": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('remSleepSeconds', 0))}}]},
-        "Awake Time": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('awakeSleepSeconds', 0))}}]},
-        "Resting HR": {"number": sleep_data.get('restingHeartRate', 0)}
+        "日期": {"title": [{"text": {"content": format_date_for_name(sleep_date)}}]},
+        "时间段": {"rich_text": [{"text": {"content": f"{format_time_readable(daily_sleep.get('sleepStartTimestampGMT'))} → {format_time_readable(daily_sleep.get('sleepEndTimestampGMT'))}"}}]},
+        "长日期": {"date": {"start": sleep_date}},
+        "完整时间": {"date": {"start": format_time(daily_sleep.get('sleepStartTimestampGMT')), "end": format_time(daily_sleep.get('sleepEndTimestampGMT'))}},
+        "总睡眠 (h)": {"number": round(total_sleep / 3600, 1)},
+        "浅睡 (h)": {"number": round(daily_sleep.get('lightSleepSeconds', 0) / 3600, 1)},
+        "深睡 (h)": {"number": round(daily_sleep.get('deepSleepSeconds', 0) / 3600, 1)},
+        "快速眼动 (h)": {"number": round(daily_sleep.get('remSleepSeconds', 0) / 3600, 1)},
+        "清醒时间 (h)": {"number": round(daily_sleep.get('awakeSleepSeconds', 0) / 3600, 1)},
+        "总睡眠时长": {"rich_text": [{"text": {"content": format_duration(total_sleep)}}]},
+        "浅睡时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('lightSleepSeconds', 0))}}]},
+        "深睡时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('deepSleepSeconds', 0))}}]},
+        "快速眼动时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('remSleepSeconds', 0))}}]},
+        "清醒时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('awakeSleepSeconds', 0))}}]},
+        "静息心率": {"number": sleep_data.get('restingHeartRate', 0)}
     }
     
     client.pages.create(parent={"database_id": database_id}, properties=properties, icon={"emoji": "😴"})
