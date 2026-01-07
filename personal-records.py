@@ -176,6 +176,7 @@ def replace_activity_name_by_typeId(typeId):
     return typeId_name_map.get(typeId, "Unnamed Activity")
 
 def get_existing_record(client, database_id, activity_name):
+    # [修复] property 改为 "纪录名称" (Record)
     query = client.databases.query(
         database_id=database_id,
         filter={
