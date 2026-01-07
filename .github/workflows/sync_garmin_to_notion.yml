@@ -38,12 +38,12 @@ jobs:
         env:
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
-          NOTION_PR_DB_ID: ${{ secrets.NOTION_PR_DB_ID }}
-          NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
-          NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
-          TZ: 'America/Montreal'
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }} 
+          NOTION_DB_ID: ${{ secrets.NOTION_CN_DB_ID }} 
+          NOTION_PR_DB_ID: ${{ secrets.NOTION_CN_PR_DB_ID }}
+          NOTION_STEPS_DB_ID: ${{ secrets.NOTION_CN_STEPS_DB_ID }}
+          NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_CN_SLEEP_DB_ID }}
+          TZ: 'Asia/Shanghai' 
         run: |
           python garmin-activities.py
           python personal-records.py
