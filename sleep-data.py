@@ -36,12 +36,13 @@ def format_date_for_name(sleep_date):
     return datetime.strptime(sleep_date, "%Y-%m-%d").strftime("%d.%m.%Y") if sleep_date else "Unknown"
 
 def sleep_data_exists(client, database_id, sleep_date):
+    # [修复] 这里的 property 必须是 "长日期" (Long Date)
     query = client.databases.query(
         database_id=database_id,
         filter={"property": "长日期", "date": {"equals": sleep_date}}
     )
     results = query.get('results', [])
-    return results[0] if results else None  # Ensure it returns None instead of causing IndexError
+    return results[0] if results else None
     
 def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
     daily_sleep = sleep_data.get('dailySleepDTO', {})
