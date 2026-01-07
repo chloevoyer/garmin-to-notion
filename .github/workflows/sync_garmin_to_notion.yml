@@ -45,9 +45,12 @@ jobs:
           NOTION_STEPS_DB_ID: ${{ secrets.NOTION_CN_STEPS_DB_ID }}
           NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_CN_SLEEP_DB_ID }}
           TZ: 'Asia/Shanghai'
-        run: |
+        #run: |
           # 按顺序运行脚本
-          python garmin-activities.py
-          python personal-records.py
-          python daily-steps.py
-          python sleep-data.py
+          #python garmin-activities.py
+          #python personal-records.py
+          #python daily-steps.py
+          #python sleep-data.py
+        run: |
+          # 运行历史回填脚本
+          python manual_backfill.py
