@@ -53,10 +53,14 @@ def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
         (daily_sleep.get(k, 0) or 0) for k in ['deepSleepSeconds', 'lightSleepSeconds', 'remSleepSeconds']
     )
     
-    
     if skip_zero_sleep and total_sleep == 0:
         print(f"Skipping sleep data for {sleep_date} as total sleep is 0")
         return
+
+    # [新增] 计算是否达成睡眠目标 (这里默认设为 8 小时，即 28800 秒)
+    # 如果你想改成 7 小时，就把 28800 改成 25200 (7 * 3600)
+    sleep_goal_seconds = 8 * 3600 
+    is_goal_met = total_sleep >= sleep_goal_seconds
 
     properties = {
         "日期": {"title": [{"text": {"content": format_date_for_name(sleep_date)}}]},
@@ -73,7 +77,8 @@ def create_sleep_data(client, database_id, sleep_data, skip_zero_sleep=True):
         "深睡时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('deepSleepSeconds', 0))}}]},
         "快速眼动时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('remSleepSeconds', 0))}}]},
         "清醒时长": {"rich_text": [{"text": {"content": format_duration(daily_sleep.get('awakeSleepSeconds', 0))}}]},
-        "静息心率": {"number": sleep_data.get('restingHeartRate', 0)}
+        "静息心率": {"number": sleep_data.get('restingHeartRate', 0)},
+        "睡眠目标": {"checkbox": is_goal_met} # [新增] 写入 checkbox 状态
     }
     
     client.pages.create(parent={"database_id": database_id}, properties=properties, icon={"emoji": "😴"})
