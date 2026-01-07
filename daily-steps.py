@@ -17,9 +17,6 @@ def get_all_daily_steps(garmin):
     return daily_steps
 
 def daily_steps_exist(client, database_id, activity_date):
-    """
-    Check if daily step count already exists in the Notion database.
-    """
     query = client.databases.query(
         database_id=database_id,
         filter={
