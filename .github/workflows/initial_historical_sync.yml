@@ -1,0 +1,55 @@
+name: Initial Historical Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of days to sync for steps and sleep data'
+        required: false
+        default: '365'
+        type: string
+      activities:
+        description: 'Maximum number of activities to sync'
+        required: false
+        default: '100'
+        type: string
+
+env:
+  TZ: 'America/Montreal'
+
+jobs:
+  historical-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+
+      - name: Run Historical Sync
+        env:
+          GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
+          GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
+          NOTION_PR_DB_ID: ${{ secrets.NOTION_PR_DB_ID }}
+          NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
+          NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
+          TZ: 'America/Montreal'
+        run: |
+          python sync_historical_data.py --days ${{ github.event.inputs.days }} --activities ${{ github.event.inputs.activities }}

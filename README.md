@@ -43,6 +43,27 @@ For more advanced users, follow these steps to set up the integration:
 `python garmin-activities.py`
 * Run [person-records.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/personal-records.py) to extract activity records (e.g., fastest run, longest ride).  
 `python personal-records.py` 
+
+### 6. Sync Historical Data (One-Time Setup) :clock1:
+Import your historical Garmin data using **one of these methods**:
+
+**Option A: GitHub Actions** (Recommended)
+1. Go to **Actions** → **Initial Historical Sync**
+2. Click **Run workflow**
+3. Adjust days/activities if needed
+4. Click **Run workflow**
+
+**Option B: Run Locally**
+```bash
+# Default: 365 days of steps/sleep, 100 activities
+python sync_historical_data.py
+
+# Custom: sync more data
+python sync_historical_data.py --days 730 --activities 500
+```
+
+📖 For detailed instructions, see [HISTORICAL_SYNC.md](HISTORICAL_SYNC.md)
+
 ## Example Configuration :pencil:  
 You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.  
 
