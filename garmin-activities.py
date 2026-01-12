@@ -257,6 +257,7 @@ def main():
 
     # Initialize Garmin and Notion clients using environment variables
     garmin_email = os.getenv("GARMIN_EMAIL")
+    print("GARMIN_EMAIL:", garmin_email)
     garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_DB_ID")
