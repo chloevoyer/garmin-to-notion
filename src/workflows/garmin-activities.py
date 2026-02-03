@@ -1,11 +1,12 @@
-import os
 from datetime import datetime, UTC, timedelta
 
 import pytz
 from dotenv import load_dotenv
-from src.helpers import get_garmin_client, get_notion_client
 from garminconnect import Garmin as GarminClient
 from notion_client import Client as NotionClient
+
+from src.helpers import get_garmin_client, get_notion_client
+
 # Your local time zone, replace with the appropriate one if needed
 local_tz = pytz.timezone('America/Toronto')
 
@@ -290,13 +291,13 @@ def main():
     load_dotenv()
 
     # Initialize Garmin and Notion clients using environment variables
-    garmin_client = get_garmin_client()
+    garmin_client, garmin_configuration = get_garmin_client()
     notion_client, notion_dbs = get_notion_client()
-    garmin_fetch_limit = int(os.getenv("GARMIN_ACTIVITIES_FETCH_LIMIT", "1000"))
 
     database_id = notion_dbs.activities
+
     # Get all activities
-    activities = get_all_activities(garmin_client, garmin_fetch_limit)
+    activities = get_all_activities(garmin_client, garmin_configuration.activity_fetch_limit)
 
     # Process all activities
     for activity in activities:

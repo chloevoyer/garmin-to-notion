@@ -92,7 +92,7 @@ def main():
     load_dotenv()
 
     # Initialize Garmin and Notion clients using environment variables
-    garmin_client = get_garmin_client()
+    garmin_client, _ = get_garmin_client()
     notion_client, notion_dbs = get_notion_client()
 
     database_id = notion_dbs.sleep

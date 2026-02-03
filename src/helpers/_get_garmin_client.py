@@ -1,12 +1,29 @@
 import os
+from dataclasses import dataclass
 
 from dotenv import load_dotenv
 from garminconnect import Garmin
 
 
-def get_garmin_client() -> Garmin:
+@dataclass(frozen=True)
+class GarminConfiguration:
+    activity_fetch_limit: int
+
+
+def get_garmin_client() -> tuple[Garmin, GarminConfiguration]:
     load_dotenv()
 
+    print("Initializing Garmin client...")
+
+    garmin_client = _get_garmin_client()
+    garmin_configuration = _get_garmin_configuration()
+
+    print("Garmin client authenticated successfully.")
+
+    return garmin_client, garmin_configuration
+
+
+def _get_garmin_client() -> Garmin:
     # Initialize Garmin and Notion clients using environment variables
     garmin_email = os.getenv("GARMIN_EMAIL")
     garmin_password = os.getenv("GARMIN_PASSWORD")
@@ -30,6 +47,10 @@ def get_garmin_client() -> Garmin:
         print("Using basic authentication for Garmin Connect.")
         garmin_client.login()
 
-    print("Garmin client authenticated successfully.")
-
     return garmin_client
+
+
+def _get_garmin_configuration():
+    return GarminConfiguration(
+        activity_fetch_limit=int(os.getenv("GARMIN_ACTIVITIES_FETCH_LIMIT", "1000")),
+    )
