@@ -9,15 +9,6 @@ def format_activity_type(activity_type: str) -> str:
     return activity_type.replace('_', ' ').title() if activity_type else "Unknown"
 
 
-def format_pace(average_speed: float) -> str:
-    if average_speed > 0:
-        pace_min_km = 1000 / (average_speed * 60)  # Convert m/s to min/km
-        minutes = int(pace_min_km)
-        seconds = int((pace_min_km - minutes) * 60)
-        return f"{minutes}:{seconds:02d}"
-    return ""
-
-
 def activity_exists(
     notion_client: NotionClient,
     database_id: str,
@@ -54,10 +45,6 @@ def activity_needs_update(existing_activity: dict, new_activity: dict) -> bool:
     existing_type_names = [
         opt['name'] for opt in existing_props.get('Type', {}).get('multi_select', [])
     ]
-    existing_pace = (
-        existing_props.get('Avg pace', {}).get('rich_text', [{}])[0].get('text', {}).get('content', '')
-        if existing_props.get('Avg pace', {}).get('rich_text') else ''
-    )
 
     return (
         existing_props.get('Distance (km)', {}).get('number') != round(new_activity.get('distance', 0) / 1000, 2) or
@@ -65,7 +52,6 @@ def activity_needs_update(existing_activity: dict, new_activity: dict) -> bool:
         existing_props.get('Calories', {}).get('number') != round(new_activity.get('calories', 0)) or
         existing_props.get('Avg heart rate', {}).get('number') != new_activity.get('averageHR') or
         existing_props.get('Steps', {}).get('number') != new_activity.get('steps') or
-        existing_pace != format_pace(new_activity.get('averageSpeed', 0)) or
         activity_type not in existing_type_names
     )
 
@@ -82,7 +68,6 @@ def create_activity(notion_client: NotionClient, database_id: str, activity: dic
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(activity.get('calories', 0))},
         "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
-        "Avg pace": {"rich_text": [{"text": {"content": format_pace(activity.get('averageSpeed', 0))}}]},
     }
 
     if activity.get('averageHR') is not None:
@@ -105,7 +90,6 @@ def update_activity(notion_client: NotionClient, existing_activity: dict, new_ac
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(new_activity.get('calories', 0))},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
-        "Avg pace": {"rich_text": [{"text": {"content": format_pace(new_activity.get('averageSpeed', 0))}}]},
     }
 
     if new_activity.get('averageHR') is not None:
