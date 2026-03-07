@@ -33,6 +33,7 @@ def activity_exists(
                 {"property": "Date", "date": {"on_or_before": lookup_max_date.isoformat()}},
                 {"property": "Type", "multi_select": {"contains": activity_type}},
                 {"property": "Activity", "title": {"equals": activity_name}},
+                {"property": "Data source", "select": {"equals": "Garmin"}},
             ]
         }
     )
@@ -70,6 +71,7 @@ def create_activity(notion_client: NotionClient, database_id: str, activity: dic
         "Duration (min)": {"number": round(activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(activity.get('calories', 0))},
         "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
+        "Data source": {"select": {"name": "Garmin"}},
     }
 
     if activity.get('averageHR') is not None:
