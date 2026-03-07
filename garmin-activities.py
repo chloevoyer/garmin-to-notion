@@ -7,8 +7,17 @@ from notion_client import Client as NotionClient
 CUTOFF_DATE = datetime(2025, 12, 1, tzinfo=UTC)
 
 
+ACTIVITY_TYPE_MAP = {
+    "Walking": "Walk",
+    "Running": "Run",
+}
+
+
 def format_activity_type(activity_type: str) -> str:
-    return activity_type.replace('_', ' ').title() if activity_type else "Unknown"
+    if not activity_type:
+        return "Unknown"
+    title_cased = activity_type.replace('_', ' ').title()
+    return ACTIVITY_TYPE_MAP.get(title_cased, title_cased)
 
 
 def activity_exists(
@@ -72,6 +81,7 @@ def create_activity(notion_client: NotionClient, database_id: str, activity: dic
         "Calories": {"number": round(activity.get('calories', 0))},
         "Distance (km)": {"number": round(activity.get('distance', 0) / 1000, 2)},
         "Data source": {"select": {"name": "Garmin"}},
+        "Record type": {"select": {"name": "Workout"}},
     }
 
     if activity.get('averageHR') is not None:
@@ -94,6 +104,7 @@ def update_activity(notion_client: NotionClient, existing_activity: dict, new_ac
         "Duration (min)": {"number": round(new_activity.get('duration', 0) / 60, 2)},
         "Calories": {"number": round(new_activity.get('calories', 0))},
         "Distance (km)": {"number": round(new_activity.get('distance', 0) / 1000, 2)},
+        "Record type": {"select": {"name": "Workout"}},
     }
 
     if new_activity.get('averageHR') is not None:
