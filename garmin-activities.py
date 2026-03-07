@@ -137,6 +137,8 @@ def main():
         existing_activity = activity_exists(notion_client, database_id, activity_date, activity_type, activity_name)
 
         if existing_activity:
+            if existing_activity['properties'].get('Hidden', {}).get('checkbox', False):
+                continue
             if activity_needs_update(existing_activity, activity):
                 update_activity(notion_client, existing_activity, activity)
         else:
