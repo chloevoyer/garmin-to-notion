@@ -4,6 +4,8 @@ from datetime import datetime, UTC, timedelta
 from garminconnect import Garmin as GarminClient
 from notion_client import Client as NotionClient
 
+CUTOFF_DATE = datetime(2025, 12, 1, tzinfo=UTC)
+
 
 def format_activity_type(activity_type: str) -> str:
     return activity_type.replace('_', ' ').title() if activity_type else "Unknown"
@@ -124,12 +126,17 @@ def main():
             .replace(tzinfo=UTC)
         )
 
+        if activity_date < CUTOFF_DATE:
+            continue
+
         activity_name = activity.get('activityName', 'Unnamed Activity')
         activity_type = format_activity_type(activity.get('activityType', {}).get('typeKey', 'Unknown'))
 
         existing_activity = activity_exists(notion_client, database_id, activity_date, activity_type, activity_name)
 
         if existing_activity:
+            if existing_activity['properties'].get('Hidden', {}).get('checkbox', False):
+                continue
             if activity_needs_update(existing_activity, activity):
                 update_activity(notion_client, existing_activity, activity)
         else:
