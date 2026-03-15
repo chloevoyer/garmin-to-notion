@@ -42,9 +42,11 @@ jobs:
           NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
           NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
           GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT }}
+          NOTION_STRENGTH_DB_ID: ${{ secrets.NOTION_STRENGTH_DB_ID }}
           TZ: 'America/Montreal'
         run: |
           python garmin-activities.py
           python personal-records.py
           python daily-steps.py
           python sleep-data.py
+          python strength-tracking.py
