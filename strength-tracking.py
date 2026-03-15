@@ -81,9 +81,15 @@ def aggregate_by_exercise(
         if not exercises:
             continue
         exercise = exercises[0]
-        raw_name = (exercise.get("category") or "UNKNOWN") + "__" + (exercise.get("name") or "UNKNOWN")
+        category = exercise.get("category") or "UNKNOWN"
+        name = exercise.get("name") or "UNKNOWN"
+        if category == "UNKNOWN" and name == "UNKNOWN":
+            continue
+        if name == "UNKNOWN":
+            name = category
+        raw_name = category + "__" + name
         if raw_name not in grouped:
-            grouped[raw_name] = {"sets": [], "category": exercise.get("category", ""), "name": exercise.get("name", "")}
+            grouped[raw_name] = {"sets": [], "category": category, "name": name}
         grouped[raw_name]["sets"].append(s)
 
     results = []
@@ -93,6 +99,9 @@ def aggregate_by_exercise(
 
         reps_list = [s.get("repetitionCount") or 0 for s in exercise_sets]
         weight_list = [(s.get("weight") or 0) / 1000 for s in exercise_sets]  # grams → kg
+
+        if sum(reps_list) == 0:
+            continue
 
         avg_reps = round(sum(reps_list) / sets_count, 1) if sets_count else 0
         max_weight_kg = round(max(weight_list), 3) if weight_list else 0
