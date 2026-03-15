@@ -81,7 +81,7 @@ def aggregate_by_exercise(
         if not exercises:
             continue
         exercise = exercises[0]
-        raw_name = exercise.get("category", "UNKNOWN") + "__" + exercise.get("name", "UNKNOWN")
+        raw_name = (exercise.get("category") or "UNKNOWN") + "__" + (exercise.get("name") or "UNKNOWN")
         if raw_name not in grouped:
             grouped[raw_name] = {"sets": [], "category": exercise.get("category", ""), "name": exercise.get("name", "")}
         grouped[raw_name]["sets"].append(s)
@@ -100,8 +100,8 @@ def aggregate_by_exercise(
         total_volume_kg = round(sum(r * w for r, w in zip(reps_list, weight_list)), 3)
 
         results.append({
-            "exercise_name": format_exercise_name(group["name"]),
-            "category": format_category(group["category"]),
+            "exercise_name": format_exercise_name(group["name"] or "UNKNOWN"),
+            "category": format_category(group["category"] or "UNKNOWN"),
             "date": activity_date,
             "workout_name": activity_name,
             "sets_count": sets_count,
