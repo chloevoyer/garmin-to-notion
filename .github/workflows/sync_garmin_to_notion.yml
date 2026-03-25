@@ -4,6 +4,23 @@ on:
   schedule:
     - cron: '0 1 * * *' # Daily
   workflow_dispatch:
+    inputs:
+      run_activities:
+        description: 'Run garmin-activities.py'
+        type: boolean
+        default: true
+      run_personal_records:
+        description: 'Run personal-records.py'
+        type: boolean
+        default: true
+      run_steps:
+        description: 'Run daily-steps.py'
+        type: boolean
+        default: true
+      run_sleep:
+        description: 'Run sleep-data.py'
+        type: boolean
+        default: true
 env:
   TZ: 'America/Montreal'
 
@@ -31,7 +48,7 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
-      - name: Run script
+      - name: Run Garmin scripts
         env:
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
@@ -43,7 +60,16 @@ jobs:
           GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT }}
           TZ: 'America/Montreal'
         run: |
-          python garmin-activities.py
-          python personal-records.py
-          python daily-steps.py
-          python sleep-data.py
+          python garmin-login.py
+          if [[ "${{ inputs.run_activities }}" != "false" ]]; then
+            python garmin-activities.py
+          fi
+          if [[ "${{ inputs.run_personal_records }}" != "false" ]]; then
+            python personal-records.py
+          fi
+          if [[ "${{ inputs.run_steps }}" != "false" ]]; then
+            python daily-steps.py
+          fi
+          if [[ "${{ inputs.run_sleep }}" != "false" ]]; then
+            python sleep-data.py
+          fi
