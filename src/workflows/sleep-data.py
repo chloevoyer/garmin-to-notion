@@ -83,14 +83,12 @@ def main():
     load_dotenv()
 
     # Initialize Garmin and Notion clients using environment variables
-    garmin_email = os.getenv("GARMIN_EMAIL")
-    garmin_password = os.getenv("GARMIN_PASSWORD")
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_SLEEP_DB_ID")
 
     # Initialize Garmin client and login
-    garmin = Garmin(garmin_email, garmin_password)
-    garmin.login()
+    garmin_client = GarminClient()
+    garmin_client.garth.load("~/.garth")
     client = Client(auth=notion_token)
 
     data = get_sleep_data(garmin)

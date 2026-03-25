@@ -60,16 +60,16 @@ jobs:
           GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT }}
           TZ: 'America/Montreal'
         run: |
-          python garmin-login.py
+          python helpers/garmin-login.py
           if [[ "${{ inputs.run_activities }}" != "false" ]]; then
-            python garmin-activities.py
+            python src/workflows/garmin-activities.py
           fi
           if [[ "${{ inputs.run_personal_records }}" != "false" ]]; then
-            python personal-records.py
+            python src/workflows/personal-records.py
           fi
           if [[ "${{ inputs.run_steps }}" != "false" ]]; then
-            python daily-steps.py
+            python src/workflows/daily-steps.py
           fi
           if [[ "${{ inputs.run_sleep }}" != "false" ]]; then
-            python sleep-data.py
+            python src/workflows/sleep-data.py
           fi
