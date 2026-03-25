@@ -2,7 +2,7 @@ name: Sync Garmin to Notion
 
 on:
   schedule:
-    - cron: '0 1 * * *' # Daily
+    - cron: '0 6 * * *' # Daily
   workflow_dispatch:
     inputs:
       run_activities:
@@ -16,11 +16,11 @@ on:
       run_steps:
         description: 'Run daily-steps.py'
         type: boolean
-        default: true
+        default: false
       run_sleep:
         description: 'Run sleep-data.py'
         type: boolean
-        default: true
+        default: false
 env:
   TZ: 'America/Montreal'
 
