@@ -34,15 +34,15 @@ For more advanced users, follow these steps to set up the integration:
   * GARMIN_EMAIL
   * GARMIN_PASSWORD
   * NOTION_TOKEN
-  * NOTION_DB_ID
-  * NOTION_PR_DB_ID
-  * NOTION_STEPS_DB_ID (optional)
-  * NOTION_SLEEP_DB_ID (optional)
+  * NOTION_DB_ID_ACTIVITIES
+  * NOTION_DB_ID_PR
+  * NOTION_DB_ID_STEPS (optional)
+  * NOTION_DB_ID_SLEEP (optional)
 ### 5. Run Scripts (if not using automatic workflow)
 * Run [garmin-activities.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/garmin-activities.py) to sync your Garmin activities to Notion.  
-`python garmin-activities.py`
+`python src/workflows/garmin-activities.py`
 * Run [person-records.py](https://github.com/chloevoyer/garmin-to-notion/blob/main/personal-records.py) to extract activity records (e.g., fastest run, longest ride).  
-`python personal-records.py` 
+`python src/workflows/personal-records.py` 
 ## Example Configuration :pencil:  
 You can customize the scripts to fit your needs by modifying environment variables and Notion database settings.  
 

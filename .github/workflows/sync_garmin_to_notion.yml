@@ -48,15 +48,18 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -r requirements.txt
 
+      - name: Random delay
+        run: sleep $((RANDOM % 120))  # waits 0-2 min randomly
+
       - name: Run Garmin scripts
         env:
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DB_ID: ${{ secrets.NOTION_DB_ID }}
-          NOTION_PR_DB_ID: ${{ secrets.NOTION_PR_DB_ID }}
-          NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
-          NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
+          NOTION_DB_ID_ACTIVITIES: ${{ secrets.NOTION_DB_ID_ACTIVITIES }}
+          NOTION_DB_ID_PR: ${{ secrets.NOTION_DB_ID_PR }}
+          NOTION_DB_ID_STEPS: ${{ secrets.NOTION_DB_ID_STEPS }}
+          NOTION_DB_ID_SLEEP: ${{ secrets.NOTION_DB_ID_SLEEP }}
           GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT }}
           TZ: 'America/Montreal'
         run: |
