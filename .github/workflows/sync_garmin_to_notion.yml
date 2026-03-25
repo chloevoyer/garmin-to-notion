@@ -2,7 +2,8 @@ name: Sync Garmin to Notion
 
 on:
   schedule:
-    - cron: '0 1 * * *' # Daily
+    # Runs at minute 0 of every 3rd hour (00:00, 03:00, 06:00, etc. UTC)
+    - cron: '0 */3 * * *'
   workflow_dispatch:
 env:
   TZ: 'America/Montreal'
@@ -41,9 +42,11 @@ jobs:
           NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
           NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
           GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT }}
+          NOTION_STRENGTH_DB_ID: ${{ secrets.NOTION_STRENGTH_DB_ID }}
           TZ: 'America/Montreal'
         run: |
           python garmin-activities.py
           python personal-records.py
           python daily-steps.py
           python sleep-data.py
+          python strength-tracking.py
