@@ -237,11 +237,20 @@ def write_new_record(client, database_id, activity_date, activity_type, activity
 def main():
     notion_token = os.getenv("NOTION_TOKEN")
     database_id = os.getenv("NOTION_PR_DB_ID")
-
-    garmin_client = GarminClient()
-    garmin_client.garth.load("~/.garth")
-
     client = Client(auth=notion_token)
+
+    # Try cached session first, fall back to regular login
+    token_path = os.path.expanduser("~/.garth")
+    garmin_email = os.getenv("GARMIN_EMAIL")
+    garmin_password = os.getenv("GARMIN_PASSWORD")
+
+    garmin_client = GarminClient(garmin_email, garmin_password)
+    try:
+        garmin_client.garth.load(token_path)
+        print("Loaded cached Garmin session.")
+    except Exception:
+        print("No cached session, logging in...")
+        garmin_client.login()
 
     records = garmin.get_personal_record()
     filtered_records = [record for record in records if record.get('typeId') != 16]

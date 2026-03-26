@@ -16,11 +16,11 @@ on:
       run_steps:
         description: 'Run daily-steps.py'
         type: boolean
-        default: false
+        default: true
       run_sleep:
         description: 'Run sleep-data.py'
         type: boolean
-        default: false
+        default: true
 env:
   TZ: 'America/Montreal'
 
@@ -49,7 +49,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Random delay
-        run: sleep $((RANDOM % 120))  # waits 0-2 min randomly
+        run: sleep $((RANDOM % 60))  # waits 0-2 min randomly
 
       - name: Run Garmin scripts
         env:
