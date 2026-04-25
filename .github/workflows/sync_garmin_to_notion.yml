@@ -3,6 +3,11 @@ name: Sync Garmin to Notion
 on:
   schedule:
     - cron: '0 1 * * *' # Daily
+  workflow_dispatch:
+    inputs:
+      GARMIN_ACTIVITIES_FETCH_LIMIT:
+        type: number
+        default: 10
 env:
   TZ: 'America/Toronto'
 
@@ -26,7 +31,7 @@ jobs:
           NOTION_PR_DB_ID: ${{ secrets.NOTION_PR_DB_ID }}
           NOTION_STEPS_DB_ID: ${{ secrets.NOTION_STEPS_DB_ID }}
           NOTION_SLEEP_DB_ID: ${{ secrets.NOTION_SLEEP_DB_ID }}
-          GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ vars.GARMIN_ACTIVITIES_FETCH_LIMIT }}
+          GARMIN_ACTIVITIES_FETCH_LIMIT: ${{ inputs.GARMIN_ACTIVITIES_FETCH_LIMIT || vars.GARMIN_ACTIVITIES_FETCH_LIMIT || '10' }}
           TZ: 'America/Toronto'
         run: |
           uv run python -m src.workflows.garmin-activities
