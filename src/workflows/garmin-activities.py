@@ -29,6 +29,7 @@ ACTIVITY_ICONS = {
     "Treadmill Running": "https://img.icons8.com/?size=100&id=9794&format=png&color=000000",
     "Walking": "https://img.icons8.com/?size=100&id=9807&format=png&color=000000",
     "Yoga": "https://img.icons8.com/?size=100&id=9783&format=png&color=000000",
+    "Road Biking": "https://img.icons8.com/?size=100&id=65524&format=png&color=000000",
     # Add more mappings as needed
 }
 
@@ -53,7 +54,8 @@ def format_activity_type(activity_type: str, activity_name: str = "") -> tuple[s
         "Indoor Rowing": "Rowing",
         "Speed Walking": "Walking",
         "Strength Training": "Strength",
-        "Treadmill Running": "Running"
+        "Treadmill Running": "Running",
+        "Road Biking": "Road Biking"
     }
 
     # Special replacement for Rowing V2
