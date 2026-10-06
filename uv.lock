@@ -171,7 +171,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "garminconnect", specifier = ">=0.3.3" },
+    { name = "garminconnect", specifier = ">=0.3.5" },
     { name = "notion-client", specifier = "==2.2.1" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "pytz", specifier = "==2024.1" },
@@ -179,16 +179,16 @@ requires-dist = [
 
 [[package]]
 name = "garminconnect"
-version = "0.3.3"
+version = "0.3.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "curl-cffi" },
     { name = "requests" },
     { name = "ua-generator" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/dd/d9/7ad240d86453de083f0c460ee328e8209232d9d0ee099dcf49439d90be7a/garminconnect-0.3.3.tar.gz", hash = "sha256:f608193d7a90079fa1fd1d86e8d10e88b871b6ab2500372a9dc48358f8c2d386", size = 52234, upload-time = "2026-04-22T12:57:24.79Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/d9/7ad240d86453de083f0c460ee328e8209232d9d0ee099dcf49439d90be7a/garminconnect-0.3.5.tar.gz", hash = "sha256:f608193d7a90079fa1fd1d86e8d10e88b871b6ab2500372a9dc48358f8c2d386", size = 52234, upload-time = "2026-04-22T12:57:24.79Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/5a/69af564ff61c87a725e0a6b6ceed4a01569a1caced2c136042c778907244/garminconnect-0.3.3-py3-none-any.whl", hash = "sha256:e11dbbddf20abd60d5c8fbde1e7c688ca175a905237dfec8837ee935a1aca803", size = 47814, upload-time = "2026-04-22T12:57:23.175Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/5a/69af564ff61c87a725e0a6b6ceed4a01569a1caced2c136042c778907244/garminconnect-0.3.5-py3-none-any.whl", hash = "sha256:e11dbbddf20abd60d5c8fbde1e7c688ca175a905237dfec8837ee935a1aca803", size = 47814, upload-time = "2026-04-22T12:57:23.175Z" },
 ]
 
 [[package]]
